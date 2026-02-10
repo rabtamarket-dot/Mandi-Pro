@@ -128,19 +128,19 @@ const InvoiceForm: React.FC<Props> = ({ data, onChange, onScan, onPrint, onNewBi
               </div>
               <div className="md:col-span-2">
                 <label className="text-[9px] font-black text-emerald-600 mb-1 block text-center urdu-text">وزن (Gross)</label>
-                <input type="number" className="w-full rounded-lg border-emerald-100 p-2 font-black text-sm text-center bg-emerald-50/20" value={item.weight || ''} onChange={(e) => {
+                <input type="number" step="0.01" className="w-full rounded-lg border-emerald-100 p-2 font-black text-sm text-center bg-emerald-50/20" value={item.weight || ''} onChange={(e) => {
                   const items = [...data.items]; items[idx].weight = Number(e.target.value); updateField('items', items);
                 }} />
               </div>
               <div className="md:col-span-2">
                 <label className="text-[9px] font-black text-red-500 mb-1 block text-center urdu-text">کاٹ / تھیلہ</label>
-                <input type="number" className="w-full rounded-lg border-red-100 p-2 font-bold text-sm text-center bg-red-50/10" value={item.katt || ''} onChange={(e) => {
+                <input type="number" step="0.001" className="w-full rounded-lg border-red-100 p-2 font-bold text-sm text-center bg-red-50/10" value={item.katt || ''} onChange={(e) => {
                   const items = [...data.items]; items[idx].katt = Number(e.target.value); updateField('items', items);
                 }} />
               </div>
               <div className="md:col-span-2">
                 <label className="text-[9px] font-black text-emerald-600 mb-1 block text-center urdu-text">ریٹ (Rate)</label>
-                <input type="number" className="w-full rounded-lg border-emerald-100 p-2 font-black text-sm text-center bg-emerald-50/20" value={item.rate || ''} onChange={(e) => {
+                <input type="number" step="0.01" className="w-full rounded-lg border-emerald-100 p-2 font-black text-sm text-center bg-emerald-50/20" value={item.rate || ''} onChange={(e) => {
                   const items = [...data.items]; items[idx].rate = Number(e.target.value); updateField('items', items);
                 }} />
               </div>
@@ -169,11 +169,11 @@ const InvoiceForm: React.FC<Props> = ({ data, onChange, onScan, onPrint, onNewBi
            </div>
            <div className="space-y-1">
              <label className="text-[10px] font-black text-gray-500 block urdu-text">باردانہ (تھیلہ)</label>
-             <input type="number" className="w-full p-3 rounded-xl border border-gray-200 font-bold text-center" value={data.khaliBardanaRate} onChange={(e) => updateField('khaliBardanaRate', Number(e.target.value))} />
+             <input type="number" step="0.01" className="w-full p-3 rounded-xl border border-gray-200 font-bold text-center" value={data.khaliBardanaRate} onChange={(e) => updateField('khaliBardanaRate', Number(e.target.value))} />
            </div>
            <div className="space-y-1">
              <label className="text-[10px] font-black text-gray-500 block urdu-text">بروکری (ریٹ)</label>
-             <input type="number" className="w-full p-3 rounded-xl border border-gray-200 font-bold text-center" value={data.brokerageRate} onChange={(e) => updateField('brokerageRate', Number(e.target.value))} />
+             <input type="number" step="0.01" className="w-full p-3 rounded-xl border border-gray-200 font-bold text-center" value={data.brokerageRate} onChange={(e) => updateField('brokerageRate', Number(e.target.value))} />
            </div>
            <div className="space-y-1">
              <label className="text-[10px] font-black text-gray-500 block urdu-text">بلٹی کرایہ</label>
@@ -202,9 +202,9 @@ const InvoiceForm: React.FC<Props> = ({ data, onChange, onScan, onPrint, onNewBi
 
       <div className="bg-emerald-900 text-white p-6 rounded-3xl shadow-xl space-y-6">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
-            <div><span className="text-[9px] opacity-60 block uppercase urdu-text">کانٹا وزن</span><span className="text-xl font-black">{finalGrossWeight} کلو</span></div>
-            <div><span className="text-[9px] opacity-60 block uppercase urdu-text">باردانہ کٹوتی</span><span className="text-xl font-black text-red-300">-{totalKattWeight} کلو</span></div>
-            <div><span className="text-[9px] opacity-60 block uppercase urdu-text">صافی وزن</span><span className="text-xl font-black">{activeNetWeight} کلو ({(activeNetWeight/40).toFixed(2)} من)</span></div>
+            <div><span className="text-[9px] opacity-60 block uppercase urdu-text">کانٹا وزن</span><span className="text-xl font-black">{finalGrossWeight.toFixed(2)} کلو</span></div>
+            <div><span className="text-[9px] opacity-60 block uppercase urdu-text">باردانہ کٹوتی</span><span className="text-xl font-black text-red-300">-{totalKattWeight.toFixed(3)} کلو</span></div>
+            <div><span className="text-[9px] opacity-60 block uppercase urdu-text">صافی وزن</span><span className="text-xl font-black">{activeNetWeight.toFixed(3)} کلو ({(activeNetWeight/40).toFixed(3)} من)</span></div>
             <div><span className="text-[9px] opacity-60 block uppercase urdu-text">کل کٹوتیاں</span><span className="text-xl font-black text-red-300">Rs {totalDeductions.toLocaleString(undefined, {maximumFractionDigits:0})}</span></div>
           </div>
           <div className="border-t border-white/10 pt-4 text-center">
