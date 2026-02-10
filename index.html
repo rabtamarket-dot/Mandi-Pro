@@ -26,22 +26,27 @@
         }
         .urdu-text { 
             font-family: var(--urdu-font) !important;
-            line-height: 1.6;
+            line-height: 1.9; /* Increased line spacing as requested (+3pt approx) */
             unicode-bidi: isolate;
         }
         @media print {
             @page {
-                size: 80mm auto; /* Optimized for Thermal Rolls */
+                size: 80mm auto;
                 margin: 0;
             }
+            html, body {
+                height: auto;
+                overflow: visible;
+                background: white !important;
+            }
             .no-print { display: none !important; }
-            body { background: white !important; }
             .print-container { 
-                width: 80mm !important; 
-                margin: 0 auto !important; 
-                padding: 2mm !important; 
+                width: 76mm !important; /* Slightly narrower than 80mm to avoid edge cutoffs */
+                margin: 0 !important; 
+                padding: 1mm 2mm !important; 
                 box-shadow: none !important;
                 border: none !important;
+                float: right; /* Align to right for RTL thermal printing */
             }
         }
         ::-webkit-scrollbar { width: 6px; }
