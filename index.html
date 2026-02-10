@@ -26,7 +26,7 @@
         }
         .urdu-text { 
             font-family: var(--urdu-font) !important;
-            line-height: 1.9; /* Increased line spacing as requested (+3pt approx) */
+            line-height: 2.1; /* Increased spacing (+3pt approx from default) */
             unicode-bidi: isolate;
         }
         @media print {
@@ -41,12 +41,15 @@
             }
             .no-print { display: none !important; }
             .print-container { 
-                width: 76mm !important; /* Slightly narrower than 80mm to avoid edge cutoffs */
-                margin: 0 !important; 
+                width: 297mm !important; /* Fixed width to prevent left cutoff and right gap */
+                margin: 0 auto !important; 
                 padding: 1mm 2mm !important; 
                 box-shadow: none !important;
                 border: none !important;
-                float: right; /* Align to right for RTL thermal printing */
+                display: block !important;
+            }
+            .urdu-text {
+                line-height: 2.2 !important;
             }
         }
         ::-webkit-scrollbar { width: 6px; }
