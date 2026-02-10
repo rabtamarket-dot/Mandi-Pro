@@ -1,6 +1,6 @@
 
 import { GoogleGenAI, Type } from "@google/genai";
-import { InvoiceData } from "../types";
+import { InvoiceData } from "./types";
 
 export const extractInvoiceFromImage = async (base64Image: string): Promise<Partial<InvoiceData>> => {
   const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
@@ -8,26 +8,12 @@ export const extractInvoiceFromImage = async (base64Image: string): Promise<Part
   const systemInstruction = `
     You are an expert Mandi (Grain Market) Billing Specialist.
     Your task is to extract billing details from a Mandi invoice image.
-    
-    SPECIAL BRANDING FIELDS (Look at the top of the page):
-    - "Mill Name" / "Shop Name" (Usually biggest text at top).
-    - "Address" (Text below name).
-    - "Cell" / "Phone" (Phone numbers).
-
-    KEY FIELDS TO LOOK FOR IN URDU:
-    - "??? ?????" (Party Name).
-    - "?????" (Date): YYYY-MM-DD format.
-    - "???? ????" / "????? ????" (Vehicle/Trolley No).
-    - "?????" (Broker).
-    - "???" (Rate): Price per maund (40kg).
-    - "????? ????" / "????": Item descriptions, quantities, and 'katt'.
-    - "???" (Weights): Array of numbers.
-
-    Return the data in structured JSON.
+    Specializing in handwritten notes and thermal printer receipts.
+    Return JSON.
   `;
 
   const response = await ai.models.generateContent({
-    model: 'gemini-3-flash-preview',
+    model: 'gemini-3-pro-preview',
     contents: {
       parts: [
         { inlineData: { mimeType: 'image/jpeg', data: base64Image } },
@@ -69,7 +55,10 @@ export const extractInvoiceFromImage = async (base64Image: string): Promise<Part
   });
 
   try {
-    const raw = JSON.parse(response.text);
+    const responseText = response.text;
+    if (!responseText) return {};
+    
+    const raw = JSON.parse(responseText);
     if (raw.weights && Array.isArray(raw.weights)) {
       raw.weights = raw.weights.map((w: number, i: number) => ({
         id: Math.random().toString(36).substr(2, 9),
@@ -83,3 +72,4 @@ export const extractInvoiceFromImage = async (base64Image: string): Promise<Part
     return {};
   }
 };
+
