@@ -1,7 +1,7 @@
 
 import React, { useRef, useState, useCallback } from 'react';
-import { extractInvoiceFromImage } from '../services/geminiService';
-import { InvoiceData } from '../types';
+import { extractInvoiceFromImage } from './geminiService';
+import { InvoiceData } from './types';
 
 interface Props {
   onData: (data: Partial<InvoiceData>) => void;
@@ -27,7 +27,7 @@ const AIScanner: React.FC<Props> = ({ onData, onClose }) => {
       setIsScanning(true);
       setStatus('capturing');
     } catch (err) {
-      alert("????? ???? ???? ??? ????? ??? ???? (Camera access error)");
+      alert("کیمرہ شروع کرنے میں خرابی پیش آئی۔ (Camera access error)");
       onClose();
     }
   }, [onClose]);
@@ -59,7 +59,7 @@ const AIScanner: React.FC<Props> = ({ onData, onClose }) => {
         stopCamera();
         onClose();
       } catch (err) {
-        alert("???? ?????? ??? ?????? (AI processing error)");
+        alert("ڈیٹا نکالنے میں خرابی۔ (AI processing error)");
         setStatus('capturing');
       }
     }
@@ -75,7 +75,7 @@ const AIScanner: React.FC<Props> = ({ onData, onClose }) => {
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/90 backdrop-blur-sm p-4">
       <div className="bg-white rounded-[2rem] w-full max-w-2xl overflow-hidden shadow-2xl">
         <div className="p-6 border-b flex justify-between items-center">
-          <h3 className="text-xl font-black text-emerald-900">AI ?????? (Smart Scanner)</h3>
+          <h3 className="text-xl font-black text-emerald-900">AI اسکینر (Smart Scanner)</h3>
           <button onClick={onClose} className="p-2 hover:bg-gray-100 rounded-full transition-colors">
             <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" /></svg>
           </button>
@@ -85,8 +85,8 @@ const AIScanner: React.FC<Props> = ({ onData, onClose }) => {
           {status === 'processing' && (
             <div className="absolute inset-0 z-10 flex flex-col items-center justify-center bg-emerald-900/40 backdrop-blur-md text-white">
               <div className="w-16 h-16 border-4 border-emerald-400 border-t-transparent rounded-full animate-spin mb-4"></div>
-              <p className="text-xl font-black animate-pulse">AI ???? ???? ??? ??...</p>
-              <p className="text-xs font-bold opacity-60">??? ????? ?????? ???????</p>
+              <p className="text-xl font-black animate-pulse">AI ڈیٹا نکال رہا ہے...</p>
+              <p className="text-xs font-bold opacity-60">کچھ سیکنڈ انتظار فرمائیں</p>
             </div>
           )}
           
@@ -103,7 +103,7 @@ const AIScanner: React.FC<Props> = ({ onData, onClose }) => {
 
         <div className="p-8 flex flex-col items-center gap-4 bg-emerald-50/30">
           <p className="text-sm font-bold text-emerald-800 text-center">
-            ?? ?? ??? ?? ??? ?? ??? ????? ???
+            بل یا وزن کی لسٹ کی صاف تصویر لیں
           </p>
           <button 
             disabled={status === 'processing'}
@@ -119,3 +119,4 @@ const AIScanner: React.FC<Props> = ({ onData, onClose }) => {
 };
 
 export default AIScanner;
+
