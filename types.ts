@@ -9,6 +9,7 @@ export interface CustomExpense {
   id: string;
   name: string;
   amount: number;
+  impact: 'plus' | 'minus';
 }
 
 export interface InvoiceItem {
@@ -63,3 +64,4 @@ export const DEFAULT_INVOICE: InvoiceData = {
   biltyCharges: 0,
   customExpenses: []
 };
+
