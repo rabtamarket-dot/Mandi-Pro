@@ -31,26 +31,30 @@
         }
         @media print {
             @page {
+                /* Fixed size as requested: 80mm width, 297mm height */
                 size: 80mm 297mm;
-                margin: 0;
+                /* Margins from user image: Top/Bottom 0.25in (~6.35mm), Left/Right 0.2in (~5.08mm) */
+                margin: 6.35mm 5.08mm;
             }
             html, body {
-                height: auto;
-                overflow: visible;
+                height: 297mm;
+                overflow: hidden !important; /* Forces only one page */
                 background: white !important;
             }
             .no-print { display: none !important; }
             .print-container { 
-                width: 80mm !important; 
+                width: 100% !important; 
                 margin: 0 !important; 
-                padding: 2mm 4mm !important; /* Added side padding to fix cutoff */
+                padding: 0 !important;
                 box-shadow: none !important;
                 border: none !important;
                 display: block !important;
-                zoom: 75% !important; /* Set scaling to 75% as requested */
+                zoom: 75% !important; /* Scale content to 75% as requested */
+                max-height: 280mm !important; /* Ensure it stays within paper limits */
+                overflow: hidden !important;
             }
             .urdu-text {
-                line-height: 2.3 !important; /* Extra spacing for readability */
+                line-height: 2.2 !important;
             }
         }
         ::-webkit-scrollbar { width: 6px; }
