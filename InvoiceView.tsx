@@ -40,29 +40,29 @@ const InvoiceView: React.FC<Props> = ({ data }) => {
   }
 
   return (
-    <div className="print-container bg-white p-4 sm:p-10 rounded-3xl shadow-xl border-t-8 border-gray-800 mx-auto max-w-[800px] print:max-w-[80mm] print:p-0 print:m-0 print:shadow-none print:border-none print:rounded-none overflow-visible font-sans rtl text-center" dir="rtl">
+    <div className="print-container bg-white p-4 sm:p-6 rounded-3xl shadow-xl border-t-8 border-gray-800 mx-auto max-w-[800px] print:max-w-full print:p-0 print:m-0 print:shadow-none print:border-none print:rounded-none overflow-hidden font-sans rtl text-center" dir="rtl">
       
-      {/* Shop Header - Centered & Large */}
-      <div className="mb-4 pb-2 border-b-2 border-dashed border-black/20 print:border-black/50 text-center">
-        <h1 className="text-3xl sm:text-6xl font-black text-gray-900 mb-2 print:text-3xl urdu-text">{data.shopName || 'مل / شاپ کا نام'}</h1>
-        <p className="text-base sm:text-2xl font-bold text-gray-700 mb-1 print:text-[20px] urdu-text">{data.address || 'ایڈریس درج نہیں ہے'}</p>
-        <div className="text-gray-900 font-black text-xl print:text-[22px] urdu-text">
+      {/* Shop Header - Centered */}
+      <div className="mb-2 pb-1 border-b-2 border-dashed border-black/20 print:border-black/50 text-center">
+        <h1 className="text-3xl sm:text-5xl font-black text-gray-900 mb-1 print:text-2xl urdu-text leading-tight">{data.shopName || 'مل / شاپ کا نام'}</h1>
+        <p className="text-base sm:text-xl font-bold text-gray-700 mb-0 print:text-[14px] urdu-text">{data.address || 'ایڈریس درج نہیں ہے'}</p>
+        <div className="text-gray-900 font-black text-lg print:text-[16px] urdu-text">
           <span>فون: {data.phone || 'فون نمبر'}</span>
         </div>
       </div>
 
-      {/* Bill/Party Info - Centered */}
-      <div className="flex flex-col items-center mb-4 print:mb-2 text-sm sm:text-2xl print:text-[18px] urdu-text border-b border-black/10 pb-2 print:pb-1">
+      {/* Bill/Party Info */}
+      <div className="flex flex-col items-center mb-2 print:mb-1 text-sm sm:text-xl print:text-[15px] urdu-text border-b border-black/10 pb-1">
           <p className="font-bold">بل نمبر: <span className="font-black">{data.billNumber || '---'}</span> | تاریخ: <span className="font-black">{data.date}</span></p>
-          <p className="font-bold mt-1">پارٹی: <span className="font-black">{data.partyName || '---'}</span></p>
+          <p className="font-bold">پارٹی: <span className="font-black">{data.partyName || '---'}</span></p>
           <p className="font-bold">گاڑی نمبر: <span className="font-black">{data.trolleyNo || '---'}</span></p>
       </div>
 
-      {/* Summary Summary - Center Stats */}
-      <div className="bg-emerald-50/50 p-3 rounded-xl mb-4 border border-emerald-100 print:bg-transparent print:p-0 print:border-none print:mb-2 text-center">
-        <div className="grid grid-cols-3 gap-2 text-[12px] sm:text-xl print:text-[17px] urdu-text">
+      {/* Summary Stats */}
+      <div className="bg-emerald-50/50 p-2 rounded-xl mb-2 border border-emerald-100 print:bg-transparent print:p-0 print:border-none print:mb-1 text-center">
+        <div className="grid grid-cols-3 gap-1 text-[12px] sm:text-lg print:text-[14px] urdu-text">
           <div className="flex flex-col">
-            <span className="font-bold opacity-70 print:opacity-100">کل تھیلہ</span>
+            <span className="font-bold opacity-70 print:opacity-100">کل نول</span>
             <span className="font-black">{totalBags}</span>
           </div>
           <div className="flex flex-col">
@@ -76,36 +76,31 @@ const InvoiceView: React.FC<Props> = ({ data }) => {
         </div>
       </div>
 
-      <div className="hidden print:block border-t border-dashed border-black/30 my-3"></div>
+      <div className="hidden print:block border-t border-dashed border-black/30 my-2"></div>
 
-      {/* Items Section - Centered with Amount on 2nd Line */}
-      <div className="mb-4 print:mb-2 urdu-text text-center px-2">
+      {/* Items Section */}
+      <div className="mb-2 print:mb-1 urdu-text text-center px-1">
         {data.items.map((item, idx) => {
           const itemNetWeight = item.weight - (item.quantity * item.katt);
           const itemNetMaunds = itemNetWeight / 40;
           const itemAmount = itemNetMaunds * item.rate;
           return (
-            <div key={idx} className="border-b border-gray-100 print:border-dashed print:border-black/20 py-3 print:py-2">
-              {/* Line 1: Basic Info Centered */}
-              <div className="flex justify-center items-center gap-4 text-[13px] sm:text-xl print:text-[18px] font-bold">
-                 <span className="bg-gray-100 print:bg-transparent px-2 rounded">تھیلہ: {item.quantity}</span>
-                 <span className="font-black underline underline-offset-4">{item.description}</span>
+            <div key={idx} className="border-b border-gray-100 print:border-dashed print:border-black/20 py-2 print:py-1">
+              <div className="flex justify-center items-center gap-3 text-[13px] sm:text-lg print:text-[15px] font-bold">
+                 <span>نول: {item.quantity}</span>
+                 <span className="font-black">{item.description}</span>
                  <span>وزن: {itemNetWeight % 1 === 0 ? itemNetWeight : itemNetWeight.toFixed(3)}k</span>
               </div>
-              {/* Line 2: Rate and Amount - Explicitly Separated */}
-              <div className="flex flex-col items-center mt-2 space-y-1">
-                 <span className="text-[13px] print:text-[17px] opacity-70">ریٹ: Rs {item.rate} فی من</span>
-                 <span className="text-[16px] sm:text-2xl print:text-[20px] font-black bg-gray-50 print:bg-transparent px-4 py-1 rounded-lg">
-                    رقم: {itemAmount.toLocaleString(undefined, {maximumFractionDigits: 0})} /-
-                 </span>
+              <div className="flex flex-col items-center mt-1">
+                 <span className="text-[12px] print:text-[13px] opacity-70">ریٹ: Rs {item.rate} | رقم: <span className="font-black text-black">{itemAmount.toLocaleString(undefined, {maximumFractionDigits: 0})} /-</span></span>
               </div>
             </div>
           );
         })}
       </div>
 
-      {/* Deductions - Centered Spacing */}
-      <div className="space-y-2 text-[11px] sm:text-xl print:text-[17px] mb-4 print:mb-2 urdu-text border-t-2 border-black/10 pt-3 px-2">
+      {/* Deductions */}
+      <div className="space-y-1 text-[11px] sm:text-lg print:text-[14px] mb-2 print:mb-1 urdu-text border-t-2 border-black/10 pt-1 px-1 text-right">
           <div className="flex justify-between items-center">
             <span>کمیشن ({data.commissionRate}%):</span>
             <span className="font-bold">-{commission.toLocaleString(undefined, {maximumFractionDigits: 0})}</span>
@@ -136,23 +131,21 @@ const InvoiceView: React.FC<Props> = ({ data }) => {
           ))}
       </div>
 
-      <div className="hidden print:block border-t-2 border-dashed border-black/40 my-3"></div>
+      <div className="hidden print:block border-t-2 border-dashed border-black/40 my-2"></div>
 
-      {/* Final Total - Huge & Centered */}
-      <div className="bg-gray-900 text-white p-4 rounded-2xl text-center print:bg-transparent print:text-black print:p-0 urdu-text">
-        <p className="text-[12px] font-bold uppercase tracking-widest opacity-70 print:opacity-100 mb-1">کل صافی ادائیگی</p>
-        <p className="text-4xl sm:text-7xl font-black print:text-4xl print:leading-none">Rs {netPayable.toLocaleString(undefined, {maximumFractionDigits: 0})}</p>
+      {/* Final Total */}
+      <div className="bg-gray-900 text-white p-2 rounded-2xl text-center print:bg-transparent print:text-black print:p-0 urdu-text">
+        <p className="text-[11px] font-bold opacity-70 print:opacity-100 mb-0">کل صافی ادائیگی</p>
+        <p className="text-2xl sm:text-5xl font-black print:text-2xl print:leading-none">Rs {netPayable.toLocaleString(undefined, {maximumFractionDigits: 0})}</p>
       </div>
 
-      {/* Footer & Software Mark */}
-      <div className="mt-10 print:mt-6 text-center urdu-text space-y-8">
-        <div className="flex justify-between gap-4 px-4 border-t-2 border-black/10 pt-6 print:border-black/50 text-[12px] sm:text-xl print:text-[17px] font-bold">
-           <div className="flex-1">دستخط پارٹی</div>
-           <div className="flex-1 border-r border-black/10 pr-4">منجانب {data.shopName}</div>
+      {/* Footer */}
+      <div className="mt-4 print:mt-2 text-center urdu-text space-y-4">
+        <div className="flex justify-between gap-2 px-2 border-t-2 border-black/10 pt-2 print:border-black/50 text-[12px] print:text-[14px] font-bold">
+           <span>دستخط پارٹی</span>
+           <span>منجانب {data.shopName}</span>
         </div>
-        
-        {/* Strictly the last line - page ends here */}
-        <p className="text-[16px] sm:text-2xl print:text-[18px] italic text-emerald-800 print:text-black font-black pt-5 border-t border-dashed border-black/20">
+        <p className="text-[14px] print:text-[15px] italic text-emerald-800 print:text-black font-black border-t border-dashed border-black/10 pt-2">
           Mandi Bill Pro سافٹ ویئر
         </p>
       </div>
@@ -161,3 +154,4 @@ const InvoiceView: React.FC<Props> = ({ data }) => {
 };
 
 export default InvoiceView;
+
