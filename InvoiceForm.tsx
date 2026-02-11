@@ -37,7 +37,8 @@ const InvoiceForm: React.FC<Props> = ({ data, onChange, onScan, onPrint, onNewBi
     const newExpense: CustomExpense = {
       id: Date.now().toString(),
       name: 'دیگر خرچہ',
-      amount: 0
+      amount: 0,
+      impact: 'minus'
     };
     updateField('customExpenses', [...(data.customExpenses || []), newExpense]);
   };
@@ -62,7 +63,10 @@ const InvoiceForm: React.FC<Props> = ({ data, onChange, onScan, onPrint, onNewBi
   const commission = (totalGrossAmount * Math.abs(data.commissionRate)) / 100;
   const khaliBardana = totalBags * (data.khaliBardanaRate || 0);
   const brokerage = (activeNetWeight / 40) * (data.brokerageRate || 0);
-  const customExpensesTotal = (data.customExpenses || []).reduce((acc, e) => acc + e.amount, 0);
+  
+  const customExpensesTotal = (data.customExpenses || []).reduce((acc, e) => {
+    return e.impact === 'plus' ? acc - e.amount : acc + e.amount;
+  }, 0);
   
   const totalDeductions = commission + khaliBardana + brokerage + (data.laborCharges || 0) + (data.biltyCharges || 0) + customExpensesTotal;
 
@@ -191,6 +195,18 @@ const InvoiceForm: React.FC<Props> = ({ data, onChange, onScan, onPrint, onNewBi
                <input className="flex-1 p-2 border rounded-lg text-sm text-right urdu-text" placeholder="خرچہ کا نام" value={exp.name} onChange={(e) => {
                  const exps = [...data.customExpenses]; exps[idx].name = e.target.value; updateField('customExpenses', exps);
                }} />
+               <select 
+                 className="p-2 border rounded-lg text-xs font-black bg-gray-50"
+                 value={exp.impact}
+                 onChange={(e) => {
+                    const exps = [...data.customExpenses]; 
+                    exps[idx].impact = e.target.value as 'plus' | 'minus'; 
+                    updateField('customExpenses', exps);
+                 }}
+               >
+                 <option value="minus">- منہا</option>
+                 <option value="plus">+ جمع</option>
+               </select>
                <input type="number" className="w-32 p-2 border rounded-lg text-sm text-center" placeholder="رقم" value={exp.amount || ''} onChange={(e) => {
                  const exps = [...data.customExpenses]; exps[idx].amount = Number(e.target.value); updateField('customExpenses', exps);
                }} />
