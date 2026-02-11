@@ -26,12 +26,12 @@
         }
         .urdu-text { 
             font-family: var(--urdu-font) !important;
-            line-height: 2.1; /* Increased spacing (+3pt approx from default) */
+            line-height: 2.1; 
             unicode-bidi: isolate;
         }
         @media print {
             @page {
-                size: 80mm auto;
+                size: 80mm 297mm;
                 margin: 0;
             }
             html, body {
@@ -41,15 +41,16 @@
             }
             .no-print { display: none !important; }
             .print-container { 
-                width: 297mm !important; /* Fixed width to prevent left cutoff and right gap */
-                margin: 0 auto !important; 
-                padding: 1mm 2mm !important; 
+                width: 80mm !important; 
+                margin: 0 !important; 
+                padding: 2mm 4mm !important; /* Added side padding to fix cutoff */
                 box-shadow: none !important;
                 border: none !important;
                 display: block !important;
+                zoom: 75% !important; /* Set scaling to 75% as requested */
             }
             .urdu-text {
-                line-height: 2.2 !important;
+                line-height: 2.3 !important; /* Extra spacing for readability */
             }
         }
         ::-webkit-scrollbar { width: 6px; }
