@@ -62,7 +62,7 @@ const InvoiceView: React.FC<Props> = ({ data }) => {
       <div className="bg-emerald-50/50 p-3 rounded-xl mb-4 border border-emerald-100 print:bg-transparent print:p-0 print:border-none print:mb-2 text-center">
         <div className="grid grid-cols-3 gap-2 text-[12px] sm:text-xl print:text-[17px] urdu-text">
           <div className="flex flex-col">
-            <span className="font-bold opacity-70 print:opacity-100">کل نول</span>
+            <span className="font-bold opacity-70 print:opacity-100">کل تھیلہ</span>
             <span className="font-black">{totalBags}</span>
           </div>
           <div className="flex flex-col">
@@ -88,7 +88,7 @@ const InvoiceView: React.FC<Props> = ({ data }) => {
             <div key={idx} className="border-b border-gray-100 print:border-dashed print:border-black/20 py-3 print:py-2">
               {/* Line 1: Basic Info Centered */}
               <div className="flex justify-center items-center gap-4 text-[13px] sm:text-xl print:text-[18px] font-bold">
-                 <span className="bg-gray-100 print:bg-transparent px-2 rounded">نول: {item.quantity}</span>
+                 <span className="bg-gray-100 print:bg-transparent px-2 rounded">تھیلہ: {item.quantity}</span>
                  <span className="font-black underline underline-offset-4">{item.description}</span>
                  <span>وزن: {itemNetWeight % 1 === 0 ? itemNetWeight : itemNetWeight.toFixed(3)}k</span>
               </div>
@@ -161,4 +161,3 @@ const InvoiceView: React.FC<Props> = ({ data }) => {
 };
 
 export default InvoiceView;
-
