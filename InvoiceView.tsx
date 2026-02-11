@@ -29,15 +29,13 @@ const InvoiceView: React.FC<Props> = ({ data }) => {
   const commission = (totalGrossAmount * Math.abs(data.commissionRate)) / 100;
   const khaliBardana = totalBags * (data.khaliBardanaRate || 0);
   const brokerage = netMaundsTotal * (data.brokerageRate || 0);
-  const customExpensesTotal = (data.customExpenses || []).reduce((acc, e) => acc + e.amount, 0);
-  const otherDeductions = khaliBardana + brokerage + (data.laborCharges || 0) + (data.biltyCharges || 0) + customExpensesTotal;
   
-  let netPayable = totalGrossAmount - otherDeductions;
-  if (data.commissionImpact === 'plus') {
-    netPayable += commission;
-  } else {
-    netPayable -= commission;
-  }
+  const otherDeductionsFixed = khaliBardana + brokerage + (data.laborCharges || 0) + (data.biltyCharges || 0);
+  const customExpensesSum = (data.customExpenses || []).reduce((acc, e) => {
+    return e.impact === 'plus' ? acc - e.amount : acc + e.amount;
+  }, 0);
+
+  const netPayable = totalGrossAmount - (commission + otherDeductionsFixed + customExpensesSum);
 
   return (
     <div className="print-container bg-white p-4 sm:p-6 rounded-3xl shadow-xl border-t-8 border-gray-800 mx-auto max-w-[800px] print:max-w-full print:p-0 print:m-0 print:shadow-none print:border-none print:rounded-none overflow-hidden font-sans rtl text-center" dir="rtl">
@@ -76,7 +74,7 @@ const InvoiceView: React.FC<Props> = ({ data }) => {
         </div>
       </div>
 
-      <div className="hidden print:block border-t border-dashed border-black/30 my-2"></div>
+      <div className="hidden print:block border-t border-dashed border-black/30 my-1"></div>
 
       {/* Items Section */}
       <div className="mb-2 print:mb-1 urdu-text text-center px-1">
@@ -99,21 +97,27 @@ const InvoiceView: React.FC<Props> = ({ data }) => {
         })}
       </div>
 
-      {/* Deductions */}
-      <div className="space-y-1 text-[11px] sm:text-lg print:text-[14px] mb-2 print:mb-1 urdu-text border-t-2 border-black/10 pt-1 px-1 text-right">
+      {/* Deductions - Now with explicit Brokery and Bardana */}
+      <div className="space-y-0.5 text-[11px] sm:text-lg print:text-[14px] mb-2 print:mb-1 urdu-text border-t-2 border-black/10 pt-1 px-1 text-right">
           <div className="flex justify-between items-center">
             <span>کمیشن ({data.commissionRate}%):</span>
             <span className="font-bold">-{commission.toLocaleString(undefined, {maximumFractionDigits: 0})}</span>
           </div>
-          {data.khaliBardanaRate > 0 && (
-            <div className="flex justify-between items-center">
-              <span>خالی باردانہ:</span>
-              <span className="font-bold">-{khaliBardana.toLocaleString()}</span>
+          {khaliBardana > 0 && (
+            <div className="flex justify-between items-center border-b border-black/5 print:border-black/10">
+              <span className="font-bold">خالی باردانہ (Bag Charge):</span>
+              <span className="font-black">-{khaliBardana.toLocaleString()}</span>
+            </div>
+          )}
+          {brokerage > 0 && (
+            <div className="flex justify-between items-center border-b border-black/5 print:border-black/10">
+              <span className="font-bold">بروکری (Brokerage):</span>
+              <span className="font-black">-{brokerage.toLocaleString(undefined, {maximumFractionDigits: 0})}</span>
             </div>
           )}
           {data.laborCharges > 0 && (
             <div className="flex justify-between items-center">
-              <span>مزدوری:</span>
+              <span>مزدوری (Labor):</span>
               <span className="font-bold">-{data.laborCharges.toLocaleString()}</span>
             </div>
           )}
@@ -125,13 +129,15 @@ const InvoiceView: React.FC<Props> = ({ data }) => {
           )}
           {data.customExpenses && data.customExpenses.map(exp => (
             <div key={exp.id} className="flex justify-between items-center">
-              <span>{exp.name}:</span>
-              <span className="font-bold">-{exp.amount.toLocaleString()}</span>
+              <span>{exp.name} {exp.impact === 'plus' ? '(+)' : '(-)'}:</span>
+              <span className={`font-bold ${exp.impact === 'plus' ? 'text-blue-600 print:text-black' : ''}`}>
+                {exp.impact === 'plus' ? '+' : '-'}{exp.amount.toLocaleString()}
+              </span>
             </div>
           ))}
       </div>
 
-      <div className="hidden print:block border-t-2 border-dashed border-black/40 my-2"></div>
+      <div className="hidden print:block border-t-2 border-dashed border-black/40 my-1"></div>
 
       {/* Final Total */}
       <div className="bg-gray-900 text-white p-2 rounded-2xl text-center print:bg-transparent print:text-black print:p-0 urdu-text">
