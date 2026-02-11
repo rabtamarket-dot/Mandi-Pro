@@ -31,14 +31,13 @@
         }
         @media print {
             @page {
-                /* Fixed size as requested: 80mm width, 297mm height */
                 size: 80mm 297mm;
-                /* Margins from user image: Top/Bottom 0.25in (~6.35mm), Left/Right 0.2in (~5.08mm) */
+                /* Margins from user image: 0.25in top/bottom (~6.35mm), 0.2in left/right (~5.08mm) */
                 margin: 6.35mm 5.08mm;
             }
             html, body {
                 height: 297mm;
-                overflow: hidden !important; /* Forces only one page */
+                overflow: hidden !important; /* Strictly prevent second page */
                 background: white !important;
             }
             .no-print { display: none !important; }
@@ -49,8 +48,8 @@
                 box-shadow: none !important;
                 border: none !important;
                 display: block !important;
-                zoom: 75% !important; /* Scale content to 75% as requested */
-                max-height: 280mm !important; /* Ensure it stays within paper limits */
+                zoom: 75% !important; /* Scale to 75% */
+                max-height: 285mm !important;
                 overflow: hidden !important;
             }
             .urdu-text {
