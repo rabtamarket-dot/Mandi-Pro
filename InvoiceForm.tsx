@@ -19,7 +19,7 @@ const InvoiceForm: React.FC<Props> = ({ data, onChange, onScan, onPrint, onNewBi
   const addItem = () => {
     const newItem: InvoiceItem = { 
       id: Date.now().toString(), 
-      description: 'جنس دھان', 
+      description: 'دھان', 
       bharti: 60, 
       quantity: 1, 
       katt: 1, 
@@ -125,7 +125,7 @@ const InvoiceForm: React.FC<Props> = ({ data, onChange, onScan, onPrint, onNewBi
                 }} />
               </div>
               <div className="md:col-span-1">
-                <label className="text-[9px] font-black text-gray-400 mb-1 block text-center urdu-text">جنس (Qty)</label>
+                <label className="text-[9px] font-black text-gray-400 mb-1 block text-center urdu-text">تعداد (Qty)</label>
                 <input type="number" className="w-full rounded-lg border-gray-100 p-2 font-bold text-sm text-center" value={item.quantity || ''} onChange={(e) => {
                   const items = [...data.items]; items[idx].quantity = Number(e.target.value); updateField('items', items);
                 }} />
@@ -137,7 +137,7 @@ const InvoiceForm: React.FC<Props> = ({ data, onChange, onScan, onPrint, onNewBi
                 }} />
               </div>
               <div className="md:col-span-2">
-                <label className="text-[9px] font-black text-red-500 mb-1 block text-center urdu-text">کاٹ / جنس</label>
+                <label className="text-[9px] font-black text-red-500 mb-1 block text-center urdu-text">کاٹ / تھیلہ</label>
                 <input type="number" step="0.001" className="w-full rounded-lg border-red-100 p-2 font-bold text-sm text-center bg-red-50/10" value={item.katt || ''} onChange={(e) => {
                   const items = [...data.items]; items[idx].katt = Number(e.target.value); updateField('items', items);
                 }} />
