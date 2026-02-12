@@ -19,7 +19,7 @@ const InvoiceForm: React.FC<Props> = ({ data, onChange, onScan, onPrint, onNewBi
   const addItem = () => {
     const newItem: InvoiceItem = { 
       id: Date.now().toString(), 
-      description: 'تھیلہ دھان', 
+      description: 'جنس دھان', 
       bharti: 60, 
       quantity: 1, 
       katt: 1, 
@@ -125,7 +125,7 @@ const InvoiceForm: React.FC<Props> = ({ data, onChange, onScan, onPrint, onNewBi
                 }} />
               </div>
               <div className="md:col-span-1">
-                <label className="text-[9px] font-black text-gray-400 mb-1 block text-center urdu-text">نول (Bags)</label>
+                <label className="text-[9px] font-black text-gray-400 mb-1 block text-center urdu-text">جنس (Qty)</label>
                 <input type="number" className="w-full rounded-lg border-gray-100 p-2 font-bold text-sm text-center" value={item.quantity || ''} onChange={(e) => {
                   const items = [...data.items]; items[idx].quantity = Number(e.target.value); updateField('items', items);
                 }} />
@@ -137,7 +137,7 @@ const InvoiceForm: React.FC<Props> = ({ data, onChange, onScan, onPrint, onNewBi
                 }} />
               </div>
               <div className="md:col-span-2">
-                <label className="text-[9px] font-black text-red-500 mb-1 block text-center urdu-text">کاٹ / تھیلہ</label>
+                <label className="text-[9px] font-black text-red-500 mb-1 block text-center urdu-text">کاٹ / جنس</label>
                 <input type="number" step="0.001" className="w-full rounded-lg border-red-100 p-2 font-bold text-sm text-center bg-red-50/10" value={item.katt || ''} onChange={(e) => {
                   const items = [...data.items]; items[idx].katt = Number(e.target.value); updateField('items', items);
                 }} />
@@ -172,7 +172,7 @@ const InvoiceForm: React.FC<Props> = ({ data, onChange, onScan, onPrint, onNewBi
              <input type="number" className="w-full p-3 rounded-xl border border-gray-200 font-bold text-center" value={data.laborCharges} onChange={(e) => updateField('laborCharges', Number(e.target.value))} />
            </div>
            <div className="space-y-1">
-             <label className="text-[10px] font-black text-gray-500 block urdu-text">باردانہ (تھیلہ)</label>
+             <label className="text-[10px] font-black text-gray-500 block urdu-text">باردانہ (جنس)</label>
              <input type="number" step="0.01" className="w-full p-3 rounded-xl border border-gray-200 font-bold text-center" value={data.khaliBardanaRate} onChange={(e) => updateField('khaliBardanaRate', Number(e.target.value))} />
            </div>
            <div className="space-y-1">
