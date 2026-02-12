@@ -53,6 +53,7 @@ const InvoiceView: React.FC<Props> = ({ data }) => {
       <div className="flex flex-col items-center mb-2 print:mb-1 text-sm sm:text-xl print:text-[15px] urdu-text border-b border-black/10 pb-1">
           <p className="font-bold">بل نمبر: <span className="font-black">{data.billNumber || '---'}</span> | تاریخ: <span className="font-black">{data.date}</span></p>
           <p className="font-bold">پارٹی: <span className="font-black">{data.partyName || '---'}</span></p>
+          {data.brokerName && <p className="font-bold">بروکر کا نام: <span className="font-black">{data.brokerName}</span></p>}
           <p className="font-bold">گاڑی نمبر: <span className="font-black">{data.trolleyNo || '---'}</span></p>
       </div>
 
@@ -60,7 +61,7 @@ const InvoiceView: React.FC<Props> = ({ data }) => {
       <div className="bg-emerald-50/50 p-2 rounded-xl mb-2 border border-emerald-100 print:bg-transparent print:p-0 print:border-none print:mb-1 text-center">
         <div className="grid grid-cols-3 gap-1 text-[12px] sm:text-lg print:text-[14px] urdu-text">
           <div className="flex flex-col">
-            <span className="font-bold opacity-70 print:opacity-100">کل نول</span>
+            <span className="font-bold opacity-70 print:opacity-100">تھیلہ/بوری</span>
             <span className="font-black">{totalBags}</span>
           </div>
           <div className="flex flex-col">
@@ -85,7 +86,7 @@ const InvoiceView: React.FC<Props> = ({ data }) => {
           return (
             <div key={idx} className="border-b border-gray-100 print:border-dashed print:border-black/20 py-2 print:py-1">
               <div className="flex justify-center items-center gap-3 text-[13px] sm:text-lg print:text-[15px] font-bold">
-                 <span>نول: {item.quantity}</span>
+                 <span>جنس: {item.quantity}</span>
                  <span className="font-black">{item.description}</span>
                  <span>وزن: {itemNetWeight % 1 === 0 ? itemNetWeight : itemNetWeight.toFixed(3)}k</span>
               </div>
@@ -97,7 +98,7 @@ const InvoiceView: React.FC<Props> = ({ data }) => {
         })}
       </div>
 
-      {/* Deductions - Now with explicit Brokery and Bardana */}
+      {/* Deductions */}
       <div className="space-y-0.5 text-[11px] sm:text-lg print:text-[14px] mb-2 print:mb-1 urdu-text border-t-2 border-black/10 pt-1 px-1 text-right">
           <div className="flex justify-between items-center">
             <span>کمیشن ({data.commissionRate}%):</span>
@@ -105,7 +106,7 @@ const InvoiceView: React.FC<Props> = ({ data }) => {
           </div>
           {khaliBardana > 0 && (
             <div className="flex justify-between items-center border-b border-black/5 print:border-black/10">
-              <span className="font-bold">خالی باردانہ (Bag Charge):</span>
+              <span className="font-bold">خالی باردانہ (جنس Charge):</span>
               <span className="font-black">-{khaliBardana.toLocaleString()}</span>
             </div>
           )}
