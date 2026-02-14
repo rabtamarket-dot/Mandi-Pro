@@ -60,15 +60,23 @@ const InvoiceForm: React.FC<Props> = ({ data, onChange, onScan, onPrint, onNewBi
     return acc + (itemNetMaunds * item.rate);
   }, 0);
 
+  // Default deductions (Fixed fields are treated as minus by default)
   const commission = (totalGrossAmount * Math.abs(data.commissionRate)) / 100;
   const khaliBardana = totalBags * (data.khaliBardanaRate || 0);
   const brokerage = (activeNetWeight / 40) * (data.brokerageRate || 0);
+  const fixedDeductionsTotal = commission + khaliBardana + brokerage + (data.laborCharges || 0) + (data.biltyCharges || 0);
+
+  // Custom categorized expenses
+  const additionsTotal = (data.customExpenses || [])
+    .filter(e => e.impact === 'plus')
+    .reduce((acc, e) => acc + e.amount, 0);
+
+  const subtractsTotal = (data.customExpenses || [])
+    .filter(e => e.impact === 'minus')
+    .reduce((acc, e) => acc + e.amount, 0);
   
-  const customExpensesTotal = (data.customExpenses || []).reduce((acc, e) => {
-    return e.impact === 'plus' ? acc - e.amount : acc + e.amount;
-  }, 0);
-  
-  const totalDeductions = commission + khaliBardana + brokerage + (data.laborCharges || 0) + (data.biltyCharges || 0) + customExpensesTotal;
+  const totalNetDeductions = fixedDeductionsTotal + subtractsTotal;
+  const finalPayable = totalGrossAmount + additionsTotal - totalNetDeductions;
 
   return (
     <div className="bg-white p-3 sm:p-5 md:p-8 rounded-[1.5rem] sm:rounded-[2.5rem] shadow-2xl space-y-6 sm:space-y-10 border border-gray-100">
@@ -204,8 +212,8 @@ const InvoiceForm: React.FC<Props> = ({ data, onChange, onScan, onPrint, onNewBi
                     updateField('customExpenses', exps);
                  }}
                >
-                 <option value="minus">- منہا</option>
-                 <option value="plus">+ جمع</option>
+                 <option value="minus">- منہا (Deduct)</option>
+                 <option value="plus">+ جمع (Add)</option>
                </select>
                <input type="number" className="w-32 p-2 border rounded-lg text-sm text-center" placeholder="رقم" value={exp.amount || ''} onChange={(e) => {
                  const exps = [...data.customExpenses]; exps[idx].amount = Number(e.target.value); updateField('customExpenses', exps);
@@ -217,15 +225,16 @@ const InvoiceForm: React.FC<Props> = ({ data, onChange, onScan, onPrint, onNewBi
       </div>
 
       <div className="bg-emerald-900 text-white p-6 rounded-3xl shadow-xl space-y-6">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
+          <div className="grid grid-cols-2 md:grid-cols-5 gap-4 text-center">
             <div><span className="text-[9px] opacity-60 block uppercase urdu-text">کانٹا وزن</span><span className="text-xl font-black">{finalGrossWeight.toFixed(2)} کلو</span></div>
             <div><span className="text-[9px] opacity-60 block uppercase urdu-text">باردانہ کٹوتی</span><span className="text-xl font-black text-red-300">-{totalKattWeight.toFixed(3)} کلو</span></div>
-            <div><span className="text-[9px] opacity-60 block uppercase urdu-text">صافی وزن</span><span className="text-xl font-black">{activeNetWeight.toFixed(3)} کلو ({(activeNetWeight/40).toFixed(3)} من)</span></div>
-            <div><span className="text-[9px] opacity-60 block uppercase urdu-text">کل کٹوتیاں</span><span className="text-xl font-black text-red-300">Rs {totalDeductions.toLocaleString(undefined, {maximumFractionDigits:0})}</span></div>
+            <div><span className="text-[9px] opacity-60 block uppercase urdu-text">اضافی جمع (+)</span><span className="text-xl font-black text-blue-300">Rs {additionsTotal.toLocaleString()}</span></div>
+            <div><span className="text-[9px] opacity-60 block uppercase urdu-text">کل کٹوتی (-)</span><span className="text-xl font-black text-red-300">Rs {totalNetDeductions.toLocaleString()}</span></div>
+            <div><span className="text-[9px] opacity-60 block uppercase urdu-text">صافی وزن</span><span className="text-xl font-black">{activeNetWeight.toFixed(3)} کلو</span></div>
           </div>
           <div className="border-t border-white/10 pt-4 text-center">
              <p className="text-xs opacity-60 urdu-text">کل صافی قابلِ ادائیگی رقم</p>
-             <p className="text-4xl font-black">Rs {(totalGrossAmount - totalDeductions).toLocaleString(undefined, {maximumFractionDigits:0})}</p>
+             <p className="text-4xl font-black">Rs {finalPayable.toLocaleString(undefined, {maximumFractionDigits:0})}</p>
           </div>
       </div>
 
