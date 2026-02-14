@@ -60,7 +60,7 @@ const InvoiceForm: React.FC<Props> = ({ data, onChange, onScan, onPrint, onNewBi
     return acc + (itemNetMaunds * item.rate);
   }, 0);
 
-  // Default deductions
+  // Standard Mandi Deductions
   const commission = (totalGrossAmount * Math.abs(data.commissionRate)) / 100;
   const khaliBardana = totalBags * (data.khaliBardanaRate || 0);
   const brokerage = (activeNetWeight / 40) * (data.brokerageRate || 0);
@@ -79,7 +79,7 @@ const InvoiceForm: React.FC<Props> = ({ data, onChange, onScan, onPrint, onNewBi
   const finalPayable = totalGrossAmount + customAdditionsTotal - totalAllDeductions;
 
   return (
-    <div className="bg-white p-3 sm:p-5 md:p-8 rounded-[1.5rem] sm:rounded-[2.5rem] shadow-2xl space-y-6 sm:space-y-10 border border-gray-100 overflow-hidden">
+    <div className="bg-white p-3 sm:p-5 md:p-8 rounded-[1.5rem] sm:rounded-[2.5rem] shadow-2xl space-y-6 sm:space-y-10 border border-gray-100">
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center border-b border-emerald-50 pb-6 gap-4 sm:gap-6">
         <div>
           <h2 className="text-2xl sm:text-3xl font-black text-emerald-900 tracking-tight urdu-text">بل ایڈیٹر <span className="text-emerald-500 font-sans">Pro</span></h2>
@@ -168,11 +168,11 @@ const InvoiceForm: React.FC<Props> = ({ data, onChange, onScan, onPrint, onNewBi
         </div>
       </div>
 
-      <div className="bg-gray-50 p-4 sm:p-6 rounded-[2rem] border border-gray-200 space-y-8">
-        <h3 className="text-lg font-black text-gray-800 urdu-text">کٹوتیاں اور اخراجات (Charges & Deductions)</h3>
+      <div className="bg-gray-50 p-4 sm:p-6 rounded-[2rem] border border-gray-200">
+        <h3 className="text-lg font-black text-gray-800 mb-4 urdu-text">اکاؤنٹ اور اخراجات (Account & Deductions)</h3>
         
-        {/* Fixed Basic Deductions */}
-        <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
+        {/* Standard Mandi Deductions */}
+        <div className="grid grid-cols-2 md:grid-cols-5 gap-4 mb-8">
            <div className="space-y-1">
              <label className="text-[10px] font-black text-gray-500 block urdu-text">کمیشن (%)</label>
              <input type="number" step="0.01" className="w-full p-3 rounded-xl border border-gray-200 font-bold text-center" value={data.commissionRate} onChange={(e) => updateField('commissionRate', Number(e.target.value))} />
@@ -195,20 +195,20 @@ const InvoiceForm: React.FC<Props> = ({ data, onChange, onScan, onPrint, onNewBi
            </div>
         </div>
 
-        {/* Unified Symmetrical Extra Expenses Section */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 border-t border-gray-200 pt-8">
+        {/* Two Separate Lists for Additions and Deductions */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 border-t border-gray-200 pt-6">
            
-           {/* 1. Additions (Jama) */}
+           {/* Section 1: Additions (Jama) */}
            <div className="space-y-4">
              <div className="flex justify-between items-center px-1">
-               <h4 className="text-sm font-black text-blue-700 urdu-text">جمع ہونے والی رقم (+)</h4>
+               <h4 className="text-sm font-black text-blue-700 urdu-text">رقم جمع کریں (+)</h4>
                <button onClick={() => addCustomExpense('plus')} className="text-[10px] bg-blue-600 text-white px-3 py-1.5 rounded-xl font-black shadow-sm hover:bg-blue-700 urdu-text">+ نیا جمع</button>
              </div>
              <div className="space-y-2">
                {(data.customExpenses || []).filter(e => e.impact === 'plus').map((exp) => (
                  <div key={exp.id} className="flex gap-2 items-center bg-blue-50/40 p-2 rounded-2xl border border-blue-100/50">
                    <div className="bg-blue-600 text-white w-8 h-8 rounded-lg flex items-center justify-center font-black text-lg shadow-sm">+</div>
-                   <input className="flex-1 p-2 bg-transparent text-sm text-right urdu-text font-bold outline-none" placeholder="خرچہ کا نام" value={exp.name} onChange={(e) => {
+                   <input className="flex-1 p-2 bg-transparent text-sm text-right urdu-text font-bold outline-none" placeholder="نام (مثلاً پچھلا بقایا)" value={exp.name} onChange={(e) => {
                      const exps = data.customExpenses.map(item => item.id === exp.id ? {...item, name: e.target.value} : item);
                      updateField('customExpenses', exps);
                    }} />
@@ -220,22 +220,22 @@ const InvoiceForm: React.FC<Props> = ({ data, onChange, onScan, onPrint, onNewBi
                  </div>
                ))}
                {(data.customExpenses || []).filter(e => e.impact === 'plus').length === 0 && (
-                 <p className="text-[10px] text-gray-300 text-center py-4 border-2 border-dashed border-gray-100 rounded-2xl urdu-text">کوئی اضافی رقم نہیں ہے</p>
+                 <p className="text-[10px] text-gray-300 text-center py-4 border-2 border-dashed border-gray-100 rounded-2xl urdu-text">کوئی جمع رقم درج نہیں ہے</p>
                )}
              </div>
            </div>
 
-           {/* 2. Deductions (Manfi) */}
+           {/* Section 2: Deductions (Manfi) */}
            <div className="space-y-4">
              <div className="flex justify-between items-center px-1">
-               <h4 className="text-sm font-black text-red-700 urdu-text">منہا ہونے والی رقم (-)</h4>
+               <h4 className="text-sm font-black text-red-700 urdu-text">رقم منہا کریں (-)</h4>
                <button onClick={() => addCustomExpense('minus')} className="text-[10px] bg-red-600 text-white px-3 py-1.5 rounded-xl font-black shadow-sm hover:bg-red-700 urdu-text">+ نیا کٹوتی</button>
              </div>
              <div className="space-y-2">
                {(data.customExpenses || []).filter(e => e.impact === 'minus').map((exp) => (
                  <div key={exp.id} className="flex gap-2 items-center bg-red-50/40 p-2 rounded-2xl border border-red-100/50">
                    <div className="bg-red-600 text-white w-8 h-8 rounded-lg flex items-center justify-center font-black text-lg shadow-sm">-</div>
-                   <input className="flex-1 p-2 bg-transparent text-sm text-right urdu-text font-bold outline-none" placeholder="خرچہ کا نام" value={exp.name} onChange={(e) => {
+                   <input className="flex-1 p-2 bg-transparent text-sm text-right urdu-text font-bold outline-none" placeholder="نام (مثلاً ایڈوانس)" value={exp.name} onChange={(e) => {
                      const exps = data.customExpenses.map(item => item.id === exp.id ? {...item, name: e.target.value} : item);
                      updateField('customExpenses', exps);
                    }} />
@@ -247,7 +247,7 @@ const InvoiceForm: React.FC<Props> = ({ data, onChange, onScan, onPrint, onNewBi
                  </div>
                ))}
                {(data.customExpenses || []).filter(e => e.impact === 'minus').length === 0 && (
-                 <p className="text-[10px] text-gray-300 text-center py-4 border-2 border-dashed border-gray-100 rounded-2xl urdu-text">کوئی اضافی کٹوتی نہیں ہے</p>
+                 <p className="text-[10px] text-gray-300 text-center py-4 border-2 border-dashed border-gray-100 rounded-2xl urdu-text">کوئی اضافی کٹوتی درج نہیں ہے</p>
                )}
              </div>
            </div>
@@ -255,7 +255,7 @@ const InvoiceForm: React.FC<Props> = ({ data, onChange, onScan, onPrint, onNewBi
         </div>
       </div>
 
-      {/* Modern Summary Dashboard */}
+      {/* Unified Summary Dashboard */}
       <div className="bg-emerald-900 text-white p-6 rounded-[2.5rem] shadow-2xl space-y-8 relative overflow-hidden">
           <div className="absolute top-0 right-0 w-32 h-32 bg-white/5 rounded-full -mr-16 -mt-16 blur-3xl"></div>
           
@@ -297,3 +297,4 @@ const InvoiceForm: React.FC<Props> = ({ data, onChange, onScan, onPrint, onNewBi
 };
 
 export default InvoiceForm;
+
