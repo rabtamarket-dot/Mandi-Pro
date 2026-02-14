@@ -26,25 +26,32 @@ const InvoiceView: React.FC<Props> = ({ data }) => {
   const maunds = Math.floor(netMaundsTotal);
   const kgs = Math.round((netMaundsTotal - maunds) * 40);
 
-  // Categorizing Expenses for Print
+  // --- Deduction Logic ---
   const commission = (totalGrossAmount * Math.abs(data.commissionRate)) / 100;
-  const khaliBardana = totalBags * (data.khaliBardanaRate || 0);
-  const brokerage = netMaundsTotal * (data.brokerageRate || 0);
+  const laborRate = Number(data.laborCharges) || 0;
+  const laborTotal = totalBags * laborRate;
   
-  const fixedSubtractsTotal = commission + khaliBardana + brokerage + (data.laborCharges || 0) + (data.biltyCharges || 0);
+  const bardanaRate = Number(data.khaliBardanaRate) || 0;
+  const bardanaTotal = totalBags * bardanaRate;
+  
+  const brokerage = netMaundsTotal * (Number(data.brokerageRate) || 0);
+  const bilty = Number(data.biltyCharges) || 0;
 
-  const customAdditions = (data.customExpenses || []).filter(e => e.impact === 'plus');
   const customSubtracts = (data.customExpenses || []).filter(e => e.impact === 'minus');
+  const otherSubtractsTotal = customSubtracts.reduce((acc, e) => acc + (Number(e.amount) || 0), 0);
 
-  const additionsTotal = customAdditions.reduce((acc, e) => acc + e.amount, 0);
-  const subtractsTotal = fixedSubtractsTotal + customSubtracts.reduce((acc, e) => acc + e.amount, 0);
+  const totalAllDeductions = commission + laborTotal + bardanaTotal + brokerage + bilty + otherSubtractsTotal;
 
-  const netPayable = totalGrossAmount + additionsTotal - subtractsTotal;
+  // --- Addition Logic ---
+  const customAdditions = (data.customExpenses || []).filter(e => e.impact === 'plus');
+  const additionsTotal = customAdditions.reduce((acc, e) => acc + (Number(e.amount) || 0), 0);
+
+  const netPayable = totalGrossAmount + additionsTotal - totalAllDeductions;
 
   return (
     <div className="print-container bg-white p-4 sm:p-6 rounded-3xl shadow-xl border-t-8 border-gray-800 mx-auto max-w-[800px] print:max-w-full print:p-0 print:m-0 print:shadow-none print:border-none print:rounded-none overflow-hidden font-sans rtl text-center" dir="rtl">
       
-      {/* Shop Header */}
+      {/* Header */}
       <div className="mb-4 pb-2 border-b-2 border-dashed border-black/20 print:border-black/50 text-center space-y-1">
         <h1 className="text-3xl sm:text-5xl font-black text-gray-900 mb-2 print:text-2xl urdu-text leading-tight">{data.shopName || 'مل / شاپ کا نام'}</h1>
         <p className="text-lg sm:text-xl font-bold text-gray-700 print:text-[12px] urdu-text">{data.address || 'ایڈریس درج نہیں ہے'}</p>
@@ -55,7 +62,7 @@ const InvoiceView: React.FC<Props> = ({ data }) => {
 
       <div className="border-t border-dashed border-black/30 my-2 print:my-1"></div>
 
-      {/* Bill & Date Info */}
+      {/* Bill Info */}
       <div className="mb-4 print:mb-2 text-base sm:text-xl print:text-[14px] urdu-text border-b border-black/10 pb-2 flex justify-center gap-4">
           <p className="font-bold">بل نمبر: <span className="font-black">{data.billNumber || '---'}</span></p>
           <span className="opacity-30">|</span>
@@ -69,7 +76,7 @@ const InvoiceView: React.FC<Props> = ({ data }) => {
           <p className="font-bold">گاڑی نمبر: <span className="font-black">{data.trolleyNo || '---'}</span></p>
       </div>
 
-      {/* Summary Box */}
+      {/* Weights Summary Row */}
       <div className="border-y-2 border-dashed border-black/40 py-2 mb-4 print:mb-2 text-center">
         <div className="grid grid-cols-3 gap-1 text-[12px] sm:text-xl print:text-[14px] urdu-text">
           <div className="flex flex-col border-l border-black/10">
@@ -87,7 +94,7 @@ const InvoiceView: React.FC<Props> = ({ data }) => {
         </div>
       </div>
 
-      {/* Items List */}
+      {/* Items Section */}
       <div className="mb-4 print:mb-3 urdu-text text-center px-1">
         {data.items.map((item, idx) => {
           const itemNetWeight = item.weight - (item.quantity * item.katt);
@@ -110,37 +117,43 @@ const InvoiceView: React.FC<Props> = ({ data }) => {
         })}
       </div>
 
-      {/* 1. ADDITIONS SECTION (+) */}
+      {/* Account Additions (+) */}
       {additionsTotal > 0 && (
         <div className="mb-4 print:mb-2 urdu-text px-1 text-right border-t border-black/10 pt-2">
-          <h3 className="text-lg font-black border-b border-blue-200 mb-2 text-blue-800 print:text-black">رقم جمع (+)</h3>
-          <div className="space-y-1 text-sm sm:text-xl print:text-[14px]">
+          <h3 className="text-sm font-black border-b border-blue-200 mb-2 text-blue-800 print:text-black">رقم جمع (+)</h3>
+          <div className="space-y-1 text-sm sm:text-xl print:text-[13px]">
             {customAdditions.map(exp => (
               <div key={exp.id} className="flex justify-between items-center">
                 <span>{exp.name}:</span>
-                <span className="font-bold text-blue-600 print:text-black">+{exp.amount.toLocaleString()}</span>
+                <span className="font-bold text-blue-700 print:text-black">+{exp.amount.toLocaleString()}</span>
               </div>
             ))}
             <div className="flex justify-between items-center pt-1 border-t border-blue-100 font-black text-blue-900 print:text-black">
-              <span>کل جمع شدہ رقم:</span>
+              <span>کل جمع شدہ:</span>
               <span>Rs {additionsTotal.toLocaleString()}</span>
             </div>
           </div>
         </div>
       )}
 
-      {/* 2. DEDUCTIONS SECTION (-) */}
+      {/* Account Deductions (-) */}
       <div className="mb-4 print:mb-2 urdu-text px-1 text-right border-t border-black/10 pt-2">
-        <h3 className="text-lg font-black border-b border-red-200 mb-2 text-red-800 print:text-black">رقم کٹوتی (-)</h3>
-        <div className="space-y-1 text-sm sm:text-xl print:text-[14px]">
+        <h3 className="text-sm font-black border-b border-red-200 mb-2 text-red-800 print:text-black">رقم کٹوتی (-)</h3>
+        <div className="space-y-1 text-sm sm:text-xl print:text-[13px]">
           <div className="flex justify-between items-center">
             <span>کمیشن ({data.commissionRate}%):</span>
             <span className="font-bold">-{commission.toLocaleString(undefined, {maximumFractionDigits: 0})}</span>
           </div>
-          {khaliBardana > 0 && (
+          {laborTotal > 0 && (
             <div className="flex justify-between items-center">
-              <span>خالی باردانہ:</span>
-              <span className="font-black">-{khaliBardana.toLocaleString()}</span>
+              <span>مزدوری ({totalBags} تھیلے × {laborRate}):</span>
+              <span className="font-bold">-{laborTotal.toLocaleString()}</span>
+            </div>
+          )}
+          {bardanaTotal > 0 && (
+            <div className="flex justify-between items-center">
+              <span>خالی باردانہ ({totalBags} تھیلے × {bardanaRate}):</span>
+              <span className="font-black">-{bardanaTotal.toLocaleString()}</span>
             </div>
           )}
           {brokerage > 0 && (
@@ -149,34 +162,28 @@ const InvoiceView: React.FC<Props> = ({ data }) => {
               <span className="font-black">-{brokerage.toLocaleString(undefined, {maximumFractionDigits: 0})}</span>
             </div>
           )}
-          {data.laborCharges > 0 && (
-            <div className="flex justify-between items-center">
-              <span>مزدوری:</span>
-              <span className="font-bold">-{data.laborCharges.toLocaleString()}</span>
-            </div>
-          )}
-          {data.biltyCharges > 0 && (
+          {bilty > 0 && (
             <div className="flex justify-between items-center">
               <span>بلٹی کرایہ:</span>
-              <span className="font-bold">-{data.biltyCharges.toLocaleString()}</span>
+              <span className="font-bold">-{bilty.toLocaleString()}</span>
             </div>
           )}
           {customSubtracts.map(exp => (
             <div key={exp.id} className="flex justify-between items-center">
               <span>{exp.name}:</span>
-              <span className="font-bold text-red-600 print:text-black">-{exp.amount.toLocaleString()}</span>
+              <span className="font-bold text-red-700 print:text-black">-{exp.amount.toLocaleString()}</span>
             </div>
           ))}
           <div className="flex justify-between items-center pt-1 border-t border-red-100 font-black text-red-900 print:text-black">
-            <span>کل کٹوتی شدہ رقم:</span>
-            <span>Rs {subtractsTotal.toLocaleString(undefined, {maximumFractionDigits:0})}</span>
+            <span>کل کٹوتی (اخراجات):</span>
+            <span>Rs {totalAllDeductions.toLocaleString(undefined, {maximumFractionDigits:0})}</span>
           </div>
         </div>
       </div>
 
       <div className="border-t-2 border-dashed border-black/50 my-4 print:my-2"></div>
 
-      {/* Final Total */}
+      {/* Total Section */}
       <div className="text-center urdu-text py-2">
         <p className="text-base sm:text-xl print:text-[14px] font-bold opacity-70 mb-1">کل صافی قابلِ ادائیگی رقم</p>
         <p className="text-4xl sm:text-6xl font-black print:text-[30px] text-gray-900">Rs {netPayable.toLocaleString(undefined, {maximumFractionDigits: 0})}</p>
