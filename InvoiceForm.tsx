@@ -33,10 +33,10 @@ const InvoiceForm: React.FC<Props> = ({ data, onChange, onScan, onPrint, onNewBi
     updateField('items', data.items.filter(item => item.id !== id));
   };
 
-  const addCustomExpense = (impact: 'plus' | 'minus') => {
+  const addCustomExpense = (impact: 'plus' | 'minus', name: string = '') => {
     const newExpense: CustomExpense = {
       id: Date.now().toString(),
-      name: impact === 'plus' ? 'اضافی جمع' : 'دیگر کٹوتی',
+      name: name || (impact === 'plus' ? 'اضافی جمع' : 'دیگر کٹوتی'),
       amount: 0,
       impact: impact
     };
@@ -171,7 +171,7 @@ const InvoiceForm: React.FC<Props> = ({ data, onChange, onScan, onPrint, onNewBi
       <div className="bg-gray-50 p-4 sm:p-6 rounded-[2rem] border border-gray-200">
         <h3 className="text-lg font-black text-gray-800 mb-6 urdu-text">اکاؤنٹ اور اخراجات (Account & Deductions)</h3>
         
-        {/* Fixed Basic Deductions */}
+        {/* Fixed Basic Deductions - Optional, Keeping for consistency with screenshot */}
         <div className="grid grid-cols-2 md:grid-cols-5 gap-4 mb-8">
            <div className="space-y-1">
              <label className="text-[10px] font-black text-gray-500 block urdu-text">کمیشن (%)</label>
@@ -225,12 +225,21 @@ const InvoiceForm: React.FC<Props> = ({ data, onChange, onScan, onPrint, onNewBi
              </div>
            </div>
 
-           {/* 2. Deductions (Manfi) */}
+           {/* 2. Deductions (Manfi) with Quick Buttons */}
            <div className="space-y-4">
-             <div className="flex justify-between items-center px-1">
+             <div className="px-1 space-y-3">
                <h4 className="text-sm font-black text-red-700 urdu-text">رقم منہا کریں (-)</h4>
-               <button onClick={() => addCustomExpense('minus')} className="text-[10px] bg-red-600 text-white px-3 py-1.5 rounded-xl font-black shadow-sm hover:bg-red-700 urdu-text">+ نیا کٹوتی</button>
+               {/* Quick Buttons Grid */}
+               <div className="grid grid-cols-3 sm:grid-cols-6 gap-2">
+                  <button onClick={() => addCustomExpense('minus', 'کمیشن')} className="text-[9px] bg-red-50 text-red-700 border border-red-200 py-1.5 rounded-xl font-black hover:bg-red-600 hover:text-white transition-all urdu-text">کمیشن</button>
+                  <button onClick={() => addCustomExpense('minus', 'مزدوری')} className="text-[9px] bg-red-50 text-red-700 border border-red-200 py-1.5 rounded-xl font-black hover:bg-red-600 hover:text-white transition-all urdu-text">مزدوری</button>
+                  <button onClick={() => addCustomExpense('minus', 'باردانہ')} className="text-[9px] bg-red-50 text-red-700 border border-red-200 py-1.5 rounded-xl font-black hover:bg-red-600 hover:text-white transition-all urdu-text">باردانہ</button>
+                  <button onClick={() => addCustomExpense('minus', 'بروکری')} className="text-[9px] bg-red-50 text-red-700 border border-red-200 py-1.5 rounded-xl font-black hover:bg-red-600 hover:text-white transition-all urdu-text">بروکری</button>
+                  <button onClick={() => addCustomExpense('minus', 'بلٹی')} className="text-[9px] bg-red-50 text-red-700 border border-red-200 py-1.5 rounded-xl font-black hover:bg-red-600 hover:text-white transition-all urdu-text">بلٹی</button>
+                  <button onClick={() => addCustomExpense('minus', 'دیگر')} className="text-[9px] bg-red-600 text-white border border-red-600 py-1.5 rounded-xl font-black hover:bg-red-700 transition-all urdu-text">دیگر</button>
+               </div>
              </div>
+             
              <div className="space-y-2">
                {(data.customExpenses || []).filter(e => e.impact === 'minus').map((exp) => (
                  <div key={exp.id} className="flex gap-2 items-center bg-red-50/40 p-2 rounded-2xl border border-red-100/50">
@@ -247,7 +256,7 @@ const InvoiceForm: React.FC<Props> = ({ data, onChange, onScan, onPrint, onNewBi
                  </div>
                ))}
                {(data.customExpenses || []).filter(e => e.impact === 'minus').length === 0 && (
-                 <p className="text-[10px] text-gray-300 text-center py-4 border-2 border-dashed border-gray-100 rounded-2xl urdu-text">کوئی اضافی کٹوتی درج نہیں ہے</p>
+                 <p className="text-[10px] text-gray-300 text-center py-4 border-2 border-dashed border-gray-100 rounded-2xl urdu-text">کوئی کٹوتی درج نہیں ہے</p>
                )}
              </div>
            </div>
