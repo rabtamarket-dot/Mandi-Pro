@@ -33,12 +33,12 @@ const InvoiceForm: React.FC<Props> = ({ data, onChange, onScan, onPrint, onNewBi
     updateField('items', data.items.filter(item => item.id !== id));
   };
 
-  const addCustomExpense = () => {
+  const addCustomExpense = (impact: 'plus' | 'minus') => {
     const newExpense: CustomExpense = {
       id: Date.now().toString(),
-      name: 'دیگر خرچہ',
+      name: impact === 'plus' ? 'اضافی رقم' : 'دیگر کٹوتی',
       amount: 0,
-      impact: 'minus'
+      impact: impact
     };
     updateField('customExpenses', [...(data.customExpenses || []), newExpense]);
   };
@@ -60,23 +60,23 @@ const InvoiceForm: React.FC<Props> = ({ data, onChange, onScan, onPrint, onNewBi
     return acc + (itemNetMaunds * item.rate);
   }, 0);
 
-  // Default deductions (Fixed fields are treated as minus by default)
+  // Default deductions
   const commission = (totalGrossAmount * Math.abs(data.commissionRate)) / 100;
   const khaliBardana = totalBags * (data.khaliBardanaRate || 0);
   const brokerage = (activeNetWeight / 40) * (data.brokerageRate || 0);
   const fixedDeductionsTotal = commission + khaliBardana + brokerage + (data.laborCharges || 0) + (data.biltyCharges || 0);
 
-  // Custom categorized expenses
-  const additionsTotal = (data.customExpenses || [])
+  // Categorized Custom Expenses
+  const customAdditionsTotal = (data.customExpenses || [])
     .filter(e => e.impact === 'plus')
     .reduce((acc, e) => acc + e.amount, 0);
 
-  const subtractsTotal = (data.customExpenses || [])
+  const customSubtractsTotal = (data.customExpenses || [])
     .filter(e => e.impact === 'minus')
     .reduce((acc, e) => acc + e.amount, 0);
   
-  const totalNetDeductions = fixedDeductionsTotal + subtractsTotal;
-  const finalPayable = totalGrossAmount + additionsTotal - totalNetDeductions;
+  const totalAllDeductions = fixedDeductionsTotal + customSubtractsTotal;
+  const finalPayable = totalGrossAmount + customAdditionsTotal - totalAllDeductions;
 
   return (
     <div className="bg-white p-3 sm:p-5 md:p-8 rounded-[1.5rem] sm:rounded-[2.5rem] shadow-2xl space-y-6 sm:space-y-10 border border-gray-100">
@@ -133,7 +133,7 @@ const InvoiceForm: React.FC<Props> = ({ data, onChange, onScan, onPrint, onNewBi
                 }} />
               </div>
               <div className="md:col-span-1">
-                <label className="text-[9px] font-black text-gray-400 mb-1 block text-center urdu-text">تعداد (Qty)</label>
+                <label className="text-[9px] font-black text-gray-400 mb-1 block text-center urdu-text">تعداد</label>
                 <input type="number" className="w-full rounded-lg border-gray-100 p-2 font-bold text-sm text-center" value={item.quantity || ''} onChange={(e) => {
                   const items = [...data.items]; items[idx].quantity = Number(e.target.value); updateField('items', items);
                 }} />
@@ -169,8 +169,10 @@ const InvoiceForm: React.FC<Props> = ({ data, onChange, onScan, onPrint, onNewBi
       </div>
 
       <div className="bg-gray-50 p-4 sm:p-6 rounded-[2rem] border border-gray-200">
-        <h3 className="text-lg font-black text-gray-800 mb-4 urdu-text">کٹوتیاں اور اخراجات (Deductions)</h3>
-        <div className="grid grid-cols-2 md:grid-cols-5 gap-4 mb-6">
+        <h3 className="text-lg font-black text-gray-800 mb-4 urdu-text">کٹوتیاں اور اخراجات (Charges & Deductions)</h3>
+        
+        {/* Fixed Basic Deductions */}
+        <div className="grid grid-cols-2 md:grid-cols-5 gap-4 mb-8">
            <div className="space-y-1">
              <label className="text-[10px] font-black text-gray-500 block urdu-text">کمیشن (%)</label>
              <input type="number" step="0.01" className="w-full p-3 rounded-xl border border-gray-200 font-bold text-center" value={data.commissionRate} onChange={(e) => updateField('commissionRate', Number(e.target.value))} />
@@ -193,34 +195,53 @@ const InvoiceForm: React.FC<Props> = ({ data, onChange, onScan, onPrint, onNewBi
            </div>
         </div>
 
-        <div className="space-y-3 pt-4 border-t border-gray-200">
-           <div className="flex justify-between items-center">
-             <h4 className="text-sm font-black text-gray-600 urdu-text">مزید اخراجات (Extra)</h4>
-             <button onClick={addCustomExpense} className="text-[10px] bg-white border px-3 py-1 rounded-lg font-black hover:bg-gray-100 urdu-text">+ خرچہ شامل کریں</button>
-           </div>
-           {data.customExpenses && data.customExpenses.map((exp, idx) => (
-             <div key={exp.id} className="flex gap-3 items-center">
-               <input className="flex-1 p-2 border rounded-lg text-sm text-right urdu-text" placeholder="خرچہ کا نام" value={exp.name} onChange={(e) => {
-                 const exps = [...data.customExpenses]; exps[idx].name = e.target.value; updateField('customExpenses', exps);
-               }} />
-               <select 
-                 className="p-2 border rounded-lg text-xs font-black bg-gray-50"
-                 value={exp.impact}
-                 onChange={(e) => {
-                    const exps = [...data.customExpenses]; 
-                    exps[idx].impact = e.target.value as 'plus' | 'minus'; 
-                    updateField('customExpenses', exps);
-                 }}
-               >
-                 <option value="minus">- منہا (Deduct)</option>
-                 <option value="plus">+ جمع (Add)</option>
-               </select>
-               <input type="number" className="w-32 p-2 border rounded-lg text-sm text-center" placeholder="رقم" value={exp.amount || ''} onChange={(e) => {
-                 const exps = [...data.customExpenses]; exps[idx].amount = Number(e.target.value); updateField('customExpenses', exps);
-               }} />
-               <button onClick={() => removeCustomExpense(exp.id)} className="text-red-400 font-black">×</button>
+        {/* Categorized Extra Expenses */}
+        <div className="space-y-8 border-t border-gray-200 pt-6">
+           
+           {/* 1. Additions (Jama) */}
+           <div className="space-y-3">
+             <div className="flex justify-between items-center">
+               <h4 className="text-sm font-black text-blue-600 urdu-text">جمع ہونے والی رقم (+)</h4>
+               <button onClick={() => addCustomExpense('plus')} className="text-[10px] bg-blue-50 text-blue-700 border border-blue-100 px-3 py-1 rounded-lg font-black hover:bg-blue-100 urdu-text">+ رقم شامل کریں</button>
              </div>
-           ))}
+             {(data.customExpenses || []).filter(e => e.impact === 'plus').map((exp) => (
+               <div key={exp.id} className="flex gap-3 items-center bg-blue-50/20 p-2 rounded-xl border border-blue-50">
+                 <span className="font-black text-blue-500">+</span>
+                 <input className="flex-1 p-2 border-0 bg-transparent text-sm text-right urdu-text font-bold" placeholder="نام" value={exp.name} onChange={(e) => {
+                   const exps = data.customExpenses.map(item => item.id === exp.id ? {...item, name: e.target.value} : item);
+                   updateField('customExpenses', exps);
+                 }} />
+                 <input type="number" className="w-32 p-2 border-0 bg-white rounded-lg text-sm text-center font-black" placeholder="رقم" value={exp.amount || ''} onChange={(e) => {
+                   const exps = data.customExpenses.map(item => item.id === exp.id ? {...item, amount: Number(e.target.value)} : item);
+                   updateField('customExpenses', exps);
+                 }} />
+                 <button onClick={() => removeCustomExpense(exp.id)} className="text-red-400 font-black px-2">×</button>
+               </div>
+             ))}
+           </div>
+
+           {/* 2. Deductions (Manfi) */}
+           <div className="space-y-3">
+             <div className="flex justify-between items-center">
+               <h4 className="text-sm font-black text-red-600 urdu-text">منہا ہونے والی رقم (-)</h4>
+               <button onClick={() => addCustomExpense('minus')} className="text-[10px] bg-red-50 text-red-700 border border-red-100 px-3 py-1 rounded-lg font-black hover:bg-red-100 urdu-text">+ کٹوتی شامل کریں</button>
+             </div>
+             {(data.customExpenses || []).filter(e => e.impact === 'minus').map((exp) => (
+               <div key={exp.id} className="flex gap-3 items-center bg-red-50/20 p-2 rounded-xl border border-red-50">
+                 <span className="font-black text-red-500">-</span>
+                 <input className="flex-1 p-2 border-0 bg-transparent text-sm text-right urdu-text font-bold" placeholder="نام" value={exp.name} onChange={(e) => {
+                   const exps = data.customExpenses.map(item => item.id === exp.id ? {...item, name: e.target.value} : item);
+                   updateField('customExpenses', exps);
+                 }} />
+                 <input type="number" className="w-32 p-2 border-0 bg-white rounded-lg text-sm text-center font-black" placeholder="رقم" value={exp.amount || ''} onChange={(e) => {
+                   const exps = data.customExpenses.map(item => item.id === exp.id ? {...item, amount: Number(e.target.value)} : item);
+                   updateField('customExpenses', exps);
+                 }} />
+                 <button onClick={() => removeCustomExpense(exp.id)} className="text-red-400 font-black px-2">×</button>
+               </div>
+             ))}
+           </div>
+
         </div>
       </div>
 
@@ -228,8 +249,8 @@ const InvoiceForm: React.FC<Props> = ({ data, onChange, onScan, onPrint, onNewBi
           <div className="grid grid-cols-2 md:grid-cols-5 gap-4 text-center">
             <div><span className="text-[9px] opacity-60 block uppercase urdu-text">کانٹا وزن</span><span className="text-xl font-black">{finalGrossWeight.toFixed(2)} کلو</span></div>
             <div><span className="text-[9px] opacity-60 block uppercase urdu-text">باردانہ کٹوتی</span><span className="text-xl font-black text-red-300">-{totalKattWeight.toFixed(3)} کلو</span></div>
-            <div><span className="text-[9px] opacity-60 block uppercase urdu-text">اضافی جمع (+)</span><span className="text-xl font-black text-blue-300">Rs {additionsTotal.toLocaleString()}</span></div>
-            <div><span className="text-[9px] opacity-60 block uppercase urdu-text">کل کٹوتی (-)</span><span className="text-xl font-black text-red-300">Rs {totalNetDeductions.toLocaleString()}</span></div>
+            <div><span className="text-[9px] opacity-60 block uppercase urdu-text">کل اضافی (+)</span><span className="text-xl font-black text-blue-300">Rs {customAdditionsTotal.toLocaleString()}</span></div>
+            <div><span className="text-[9px] opacity-60 block uppercase urdu-text">کل کٹوتی (-)</span><span className="text-xl font-black text-red-300">Rs {totalAllDeductions.toLocaleString()}</span></div>
             <div><span className="text-[9px] opacity-60 block uppercase urdu-text">صافی وزن</span><span className="text-xl font-black">{activeNetWeight.toFixed(3)} کلو</span></div>
           </div>
           <div className="border-t border-white/10 pt-4 text-center">
