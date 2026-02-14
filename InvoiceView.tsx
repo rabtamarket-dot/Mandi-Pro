@@ -26,18 +26,18 @@ const InvoiceView: React.FC<Props> = ({ data }) => {
   const maunds = Math.floor(netMaundsTotal);
   const kgs = Math.round((netMaundsTotal - maunds) * 40);
 
-  // Categorizing Expenses
+  // Categorizing Expenses for Print
   const commission = (totalGrossAmount * Math.abs(data.commissionRate)) / 100;
   const khaliBardana = totalBags * (data.khaliBardanaRate || 0);
   const brokerage = netMaundsTotal * (data.brokerageRate || 0);
   
-  const fixedMinusTotal = commission + khaliBardana + brokerage + (data.laborCharges || 0) + (data.biltyCharges || 0);
+  const fixedSubtractsTotal = commission + khaliBardana + brokerage + (data.laborCharges || 0) + (data.biltyCharges || 0);
 
   const customAdditions = (data.customExpenses || []).filter(e => e.impact === 'plus');
   const customSubtracts = (data.customExpenses || []).filter(e => e.impact === 'minus');
 
   const additionsTotal = customAdditions.reduce((acc, e) => acc + e.amount, 0);
-  const subtractsTotal = fixedMinusTotal + customSubtracts.reduce((acc, e) => acc + e.amount, 0);
+  const subtractsTotal = fixedSubtractsTotal + customSubtracts.reduce((acc, e) => acc + e.amount, 0);
 
   const netPayable = totalGrossAmount + additionsTotal - subtractsTotal;
 
@@ -87,7 +87,7 @@ const InvoiceView: React.FC<Props> = ({ data }) => {
         </div>
       </div>
 
-      {/* Item Details */}
+      {/* Item Details - Prominent Price */}
       <div className="mb-4 print:mb-3 urdu-text text-center px-1">
         {data.items.map((item, idx) => {
           const itemNetWeight = item.weight - (item.quantity * item.katt);
@@ -96,7 +96,7 @@ const InvoiceView: React.FC<Props> = ({ data }) => {
           return (
             <div key={idx} className="border-b border-dashed border-black/10 py-4 print:py-2">
               <div className="flex justify-center items-center gap-3 text-lg sm:text-3xl print:text-[20px] font-black">
-                 <span>جنس: <span className="underline">{item.quantity}</span></span>
+                 <span>تعداد: <span className="underline">{item.quantity}</span></span>
                  <span className="text-emerald-900">{item.description}</span>
                  <span>وزن: <span>{itemNetWeight % 1 === 0 ? itemNetWeight : itemNetWeight.toFixed(3)}k</span></span>
               </div>
@@ -113,7 +113,7 @@ const InvoiceView: React.FC<Props> = ({ data }) => {
 
       {/* 1. ADDITIONS SECTION (جمع ہونے والی رقم) */}
       {additionsTotal > 0 && (
-        <div className="mb-4 print:mb-2 urdu-text px-1 text-right">
+        <div className="mb-4 print:mb-2 urdu-text px-1 text-right border-t border-black/10 pt-2">
           <h3 className="text-lg font-black border-b border-blue-200 mb-2 text-blue-800 print:text-black">جمع ہونے والی رقوم (+)</h3>
           <div className="space-y-1 text-sm sm:text-2xl print:text-[16px]">
             {customAdditions.map(exp => (
@@ -123,7 +123,7 @@ const InvoiceView: React.FC<Props> = ({ data }) => {
               </div>
             ))}
             <div className="flex justify-between items-center pt-1 border-t border-blue-100 font-black text-blue-900 print:text-black">
-              <span>کل جمع:</span>
+              <span>کل جمع رقم:</span>
               <span>Rs {additionsTotal.toLocaleString()}</span>
             </div>
           </div>
@@ -131,7 +131,7 @@ const InvoiceView: React.FC<Props> = ({ data }) => {
       )}
 
       {/* 2. DEDUCTIONS SECTION (منہا ہونے والی رقم) */}
-      <div className="mb-4 print:mb-2 urdu-text px-1 text-right">
+      <div className="mb-4 print:mb-2 urdu-text px-1 text-right border-t border-black/10 pt-2">
         <h3 className="text-lg font-black border-b border-red-200 mb-2 text-red-800 print:text-black">منہا ہونے والی رقوم (-)</h3>
         <div className="space-y-1 text-sm sm:text-2xl print:text-[16px]">
           <div className="flex justify-between items-center">
@@ -169,7 +169,7 @@ const InvoiceView: React.FC<Props> = ({ data }) => {
             </div>
           ))}
           <div className="flex justify-between items-center pt-1 border-t border-red-100 font-black text-red-900 print:text-black">
-            <span>کل کٹوتی:</span>
+            <span>کل کٹوتی رقم:</span>
             <span>Rs {subtractsTotal.toLocaleString(undefined, {maximumFractionDigits:0})}</span>
           </div>
         </div>
