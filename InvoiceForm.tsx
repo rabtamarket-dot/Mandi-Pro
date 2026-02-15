@@ -7,11 +7,12 @@ interface Props {
   onChange: (data: InvoiceData) => void;
   onScan: () => void;
   onPrint: () => void;
+  onSavePdf: () => void;
   onNewBill: () => void;
   onAutoIncrement: () => void;
 }
 
-const InvoiceForm: React.FC<Props> = ({ data, onChange, onScan, onPrint, onNewBill, onAutoIncrement }) => {
+const InvoiceForm: React.FC<Props> = ({ data, onChange, onScan, onPrint, onSavePdf, onNewBill, onAutoIncrement }) => {
   const updateField = (field: keyof InvoiceData, value: any) => {
     onChange({ ...data, [field]: value });
   };
@@ -62,7 +63,7 @@ const InvoiceForm: React.FC<Props> = ({ data, onChange, onScan, onPrint, onNewBi
     return acc + (itemNetMaunds * item.rate);
   }, 0);
 
-  // 1. ADDITIONS (+) Logic
+  // 1. ADDITIONS (+) Logic - Matches the handwritten instructions
   const add_commission = (totalGrossAmount * (data.add_commissionRate || 0)) / 100;
   const add_labor = totalBags * (data.add_laborCharges || 0);
   const add_bardana = totalBags * (data.add_khaliBardanaRate || 0);
@@ -71,7 +72,7 @@ const InvoiceForm: React.FC<Props> = ({ data, onChange, onScan, onPrint, onNewBi
   
   const totalAdditions = add_commission + add_labor + add_bardana + add_brokerage + (data.add_biltyCharges || 0) + add_custom;
 
-  // 2. DEDUCTIONS (-) Logic
+  // 2. DEDUCTIONS (-) Logic - Matches the handwritten instructions
   const neg_commission = (totalGrossAmount * (data.commissionRate || 0)) / 100;
   const neg_labor = totalBags * (data.laborCharges || 0);
   const neg_bardana = totalBags * (data.khaliBardanaRate || 0);
@@ -321,8 +322,12 @@ const InvoiceForm: React.FC<Props> = ({ data, onChange, onScan, onPrint, onNewBi
           </div>
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 no-print">
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 no-print">
         <button onClick={onNewBill} className="p-5 border-2 border-emerald-100 text-emerald-700 font-black rounded-3xl hover:bg-emerald-50 transition-all active:scale-95 urdu-text">نیا بل</button>
+        <button onClick={onSavePdf} className="p-5 bg-red-600 text-white font-black rounded-3xl shadow-xl hover:bg-red-700 transition-all active:scale-95 urdu-text flex items-center justify-center gap-3">
+          <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" /></svg>
+          PDF محفوظ کریں
+        </button>
         <button onClick={onPrint} className="p-5 bg-emerald-600 text-white font-black rounded-3xl shadow-xl hover:bg-emerald-700 transition-all active:scale-95 urdu-text">پرنٹ کریں</button>
       </div>
     </div>
