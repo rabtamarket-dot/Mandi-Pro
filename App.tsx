@@ -108,6 +108,12 @@ const App: React.FC = () => {
     }, 500);
   };
 
+  const saveAsPdf = () => {
+    // Standard browsers support "Print to PDF" via window.print()
+    // This provides a "Save as PDF" option on all devices.
+    printInvoice();
+  };
+
   const generateNextBillNumber = useCallback(() => {
     const currentNoStr = data.billNumber || localStorage.getItem('last_bill_no') || '1000';
     const match = currentNoStr.match(/(\d+)$/);
@@ -209,6 +215,7 @@ const App: React.FC = () => {
               onChange={setData} 
               onScan={() => isOnline ? setShowScanner(true) : alert('انٹرنیٹ ضروری ہے')} 
               onPrint={printInvoice}
+              onSavePdf={saveAsPdf}
               onNewBill={resetData}
               onAutoIncrement={() => setData(prev => ({...prev, billNumber: generateNextBillNumber()}))}
             />
@@ -220,21 +227,26 @@ const App: React.FC = () => {
         </main>
 
         <div className="fixed bottom-0 left-0 right-0 p-4 md:p-6 no-print z-50 flex justify-center pointer-events-none">
-          <div className="flex gap-4 w-full max-w-lg bg-white/90 backdrop-blur-2xl p-4 rounded-[2.5rem] border border-gray-200 shadow-2xl pointer-events-auto items-center ring-1 ring-black/5 animate-in slide-in-from-bottom duration-700">
+          <div className="flex gap-2 w-full max-w-xl bg-white/90 backdrop-blur-2xl p-4 rounded-[2.5rem] border border-gray-200 shadow-2xl pointer-events-auto items-center ring-1 ring-black/5 animate-in slide-in-from-bottom duration-700">
             <button 
               onClick={resetData} 
-              className="flex-1 px-4 py-4 bg-white hover:bg-emerald-50 text-emerald-700 font-black rounded-3xl transition-all active:scale-95 flex items-center justify-center gap-2 border-2 border-emerald-100 shadow-sm group"
+              className="flex-1 px-3 py-4 bg-white hover:bg-emerald-50 text-emerald-700 font-black rounded-3xl transition-all active:scale-95 flex items-center justify-center gap-2 border-2 border-emerald-100 shadow-sm group"
             >
-              <div className="bg-emerald-100 p-1.5 rounded-full group-hover:rotate-180 transition-transform duration-500">
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M12 4v16m8-8H4" /></svg>
-              </div>
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M12 4v16m8-8H4" /></svg>
               نیا بل
             </button>
             <button 
-              onClick={printInvoice} 
-              className="flex-[2] px-6 py-4 bg-emerald-600 hover:bg-emerald-700 text-white font-black rounded-3xl shadow-xl shadow-emerald-200 transition-all active:scale-95 flex items-center justify-center gap-3 text-lg"
+              onClick={saveAsPdf} 
+              className="flex-1 px-3 py-4 bg-red-600 hover:bg-red-700 text-white font-black rounded-3xl shadow-xl shadow-red-100 transition-all active:scale-95 flex items-center justify-center gap-2"
             >
-              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" /></svg>
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" /></svg>
+              PDF
+            </button>
+            <button 
+              onClick={printInvoice} 
+              className="flex-[1.5] px-4 py-4 bg-emerald-600 hover:bg-emerald-700 text-white font-black rounded-3xl shadow-xl shadow-emerald-200 transition-all active:scale-95 flex items-center justify-center gap-2"
+            >
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" /></svg>
               پرنٹ بل
             </button>
           </div>
@@ -258,3 +270,4 @@ const App: React.FC = () => {
 };
 
 export default App;
+
