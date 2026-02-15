@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { InvoiceData } from './types';
+import { InvoiceData } from '../types';
 
 interface Props {
   data: InvoiceData;
@@ -27,6 +27,8 @@ const InvoiceView: React.FC<Props> = ({ data }) => {
   const kgs = Math.round((netMaundsTotal - maunds) * 40);
 
   // --- ADDITIONS (+) Logic ---
+  // Fix: Property 'commissionImpact' does not exist on type 'InvoiceData'.
+  // Using add_commissionRate from types.ts for positive impact additions as per updated schema.
   const add_commission = (totalGrossAmount * (data.add_commissionRate || 0)) / 100;
   const add_labor = totalBags * (data.add_laborCharges || 0);
   const add_bardana = totalBags * (data.add_khaliBardanaRate || 0);
@@ -36,6 +38,7 @@ const InvoiceView: React.FC<Props> = ({ data }) => {
   const totalAdditions = add_commission + add_labor + add_bardana + add_brokerage + (data.add_biltyCharges || 0) + add_custom_total;
 
   // --- DEDUCTIONS (-) Logic ---
+  // Using commissionRate from types.ts for negative impact deductions.
   const neg_commission = (totalGrossAmount * (data.commissionRate || 0)) / 100;
   const neg_labor = totalBags * (data.laborCharges || 0);
   const neg_bardana = totalBags * (data.khaliBardanaRate || 0);
@@ -44,6 +47,7 @@ const InvoiceView: React.FC<Props> = ({ data }) => {
   const neg_custom_total = neg_custom_list.reduce((acc, e) => acc + (e.amount || 0), 0);
   const totalDeductions = neg_commission + neg_labor + neg_bardana + neg_brokerage + (data.biltyCharges || 0) + neg_custom_total;
 
+  // Calculate final payable amount by combining the gross total with calculated additions and deductions
   const netPayable = totalGrossAmount + totalAdditions - totalDeductions;
 
   return (
