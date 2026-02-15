@@ -37,6 +37,18 @@ const App: React.FC = () => {
   const [showHistory, setShowHistory] = useState(false);
   const [activeTab, setActiveTab] = useState<'editor' | 'preview'>('editor');
   const [isOnline, setIsOnline] = useState(navigator.onLine);
+  
+  // PWA Install Prompt State
+  const [deferredPrompt, setDeferredPrompt] = useState<any>(null);
+
+  useEffect(() => {
+    const handleBeforeInstallPrompt = (e: any) => {
+      e.preventDefault();
+      setDeferredPrompt(e);
+    };
+    window.addEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
+    return () => window.removeEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
+  }, []);
 
   useEffect(() => {
     if (userProfile) {
@@ -109,9 +121,36 @@ const App: React.FC = () => {
   };
 
   const saveAsPdf = () => {
-    // Standard browsers support "Print to PDF" via window.print()
-    // This provides a "Save as PDF" option on all devices.
     printInvoice();
+  };
+
+  const shareLink = async () => {
+    if (navigator.share) {
+      try {
+        await navigator.share({
+          title: 'Mandi Bill Pro',
+          text: 'منڈی بلنگ کے لیے بہترین ایپ یہاں دیکھیں:',
+          url: window.location.href,
+        });
+      } catch (err) {
+        console.log('Share failed');
+      }
+    } else {
+      navigator.clipboard.writeText(window.location.href);
+      alert('لنک کاپی کر لیا گیا ہے!');
+    }
+  };
+
+  const installApp = async () => {
+    if (deferredPrompt) {
+      deferredPrompt.prompt();
+      const { outcome } = await deferredPrompt.userChoice;
+      if (outcome === 'accepted') {
+        setDeferredPrompt(null);
+      }
+    } else {
+      alert('یہ ایپ پہلے سے انسٹال ہے یا براؤزر اس کی اجازت نہیں دے رہا۔ براہ کرم "Add to Home Screen" مینو استعمال کریں۔');
+    }
   };
 
   const generateNextBillNumber = useCallback(() => {
@@ -166,8 +205,8 @@ const App: React.FC = () => {
     <div className="min-h-screen pb-40 px-4 md:px-8 pt-8 bg-gray-50 font-sans rtl text-right" dir="rtl">
       <div className="max-w-7xl mx-auto">
         <header className="flex flex-col md:flex-row justify-between items-center mb-10 gap-6 no-print">
-          <div className="flex items-center gap-4">
-            <div className="w-16 h-16 bg-gradient-to-br from-emerald-500 to-emerald-700 rounded-2xl flex items-center justify-center text-white shadow-xl shadow-emerald-200 relative group transition-transform hover:scale-105">
+          <div className="flex items-center gap-4 w-full md:w-auto">
+            <div className="w-16 h-16 bg-gradient-to-br from-emerald-500 to-emerald-700 rounded-2xl flex items-center justify-center text-white shadow-xl shadow-emerald-200 relative group transition-transform hover:scale-105 shrink-0">
                <svg className="w-10 h-10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                  <path d="M12 2c1 0 7 3 7 8.5C19 15.5 12 22 12 22s-7-6.5-7-11.5C5 5 11 2 12 2z" />
                  <path d="M12 22V12" />
@@ -181,27 +220,38 @@ const App: React.FC = () => {
                  </div>
                )}
             </div>
-            <div>
-              <h1 className="text-3xl font-black text-gray-900 tracking-tight leading-none mb-1">Mandi Bill <span className="text-emerald-600">Pro</span></h1>
-              <div className="flex items-center gap-2">
+            <div className="flex-1">
+              <h1 className="text-2xl font-black text-gray-900 tracking-tight leading-none mb-1">Mandi Bill <span className="text-emerald-600">Pro</span></h1>
+              <div className="flex flex-wrap items-center gap-2">
                 <div className="w-2 h-2 bg-emerald-500 rounded-full animate-pulse"></div>
                 <span className="text-emerald-700 font-black text-xs uppercase tracking-wider">{userProfile.name}</span>
-                <button onClick={() => setShowHistory(true)} className="text-emerald-800 bg-emerald-100/50 px-2.5 py-1 rounded-lg text-[10px] font-black hover:bg-emerald-100 transition-all">بل ریکارڈ</button>
-                <button onClick={handleLogout} className="text-gray-400 hover:text-red-500 text-[10px] font-bold border-b border-gray-200 transition-colors">لاگ آؤٹ</button>
+                <button onClick={() => setShowHistory(true)} className="text-emerald-800 bg-emerald-100/50 px-2 py-0.5 rounded-lg text-[10px] font-black hover:bg-emerald-100 transition-all urdu-text">بل ریکارڈ</button>
+                <button onClick={handleLogout} className="text-gray-400 hover:text-red-500 text-[10px] font-bold border-b border-gray-200 transition-colors urdu-text">لاگ آؤٹ</button>
+                <button onClick={shareLink} className="text-blue-500 hover:text-blue-600 text-[10px] font-black underline flex items-center gap-1 urdu-text">
+                   <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" /></svg>
+                   شیئر کریں
+                </button>
               </div>
             </div>
+            
+            {deferredPrompt && (
+              <button onClick={installApp} className="shrink-0 bg-blue-600 text-white text-[10px] font-black px-3 py-2 rounded-xl shadow-lg shadow-blue-100 flex items-center gap-1 animate-bounce">
+                <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" /></svg>
+                ایپ انسٹال کریں
+              </button>
+            )}
           </div>
 
-          <div className="flex items-center bg-white p-1.5 rounded-2xl shadow-sm border border-gray-200">
+          <div className="flex items-center bg-white p-1.5 rounded-2xl shadow-sm border border-gray-200 shrink-0">
             <button 
               onClick={() => setActiveTab('editor')}
-              className={`px-8 py-3 rounded-xl font-black text-sm transition-all duration-200 ${activeTab === 'editor' ? 'bg-emerald-600 text-white shadow-lg shadow-emerald-200' : 'text-gray-500 hover:text-emerald-600 hover:bg-emerald-50'}`}
+              className={`px-8 py-3 rounded-xl font-black text-sm transition-all duration-200 urdu-text ${activeTab === 'editor' ? 'bg-emerald-600 text-white shadow-lg shadow-emerald-200' : 'text-gray-500 hover:text-emerald-600 hover:bg-emerald-50'}`}
             >
               ایڈیٹر
             </button>
             <button 
               onClick={() => setActiveTab('preview')}
-              className={`px-8 py-3 rounded-xl font-black text-sm transition-all duration-200 ${activeTab === 'preview' ? 'bg-emerald-600 text-white shadow-lg shadow-emerald-200' : 'text-gray-500 hover:text-emerald-600 hover:bg-emerald-50'}`}
+              className={`px-8 py-3 rounded-xl font-black text-sm transition-all duration-200 urdu-text ${activeTab === 'preview' ? 'bg-emerald-600 text-white shadow-lg shadow-emerald-200' : 'text-gray-500 hover:text-emerald-600 hover:bg-emerald-50'}`}
             >
               پیش نظارہ
             </button>
@@ -230,23 +280,23 @@ const App: React.FC = () => {
           <div className="flex gap-2 w-full max-w-xl bg-white/90 backdrop-blur-2xl p-4 rounded-[2.5rem] border border-gray-200 shadow-2xl pointer-events-auto items-center ring-1 ring-black/5 animate-in slide-in-from-bottom duration-700">
             <button 
               onClick={resetData} 
-              className="flex-1 px-3 py-4 bg-white hover:bg-emerald-50 text-emerald-700 font-black rounded-3xl transition-all active:scale-95 flex items-center justify-center gap-2 border-2 border-emerald-100 shadow-sm group"
+              className="flex-1 px-3 py-4 bg-white hover:bg-emerald-50 text-emerald-700 font-black rounded-3xl transition-all active:scale-95 flex items-center justify-center gap-2 border-2 border-emerald-100 shadow-sm group urdu-text"
             >
               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M12 4v16m8-8H4" /></svg>
               نیا بل
             </button>
             <button 
               onClick={saveAsPdf} 
-              className="flex-1 px-3 py-4 bg-red-600 hover:bg-red-700 text-white font-black rounded-3xl shadow-xl shadow-red-100 transition-all active:scale-95 flex items-center justify-center gap-2"
+              className="flex-1 px-3 py-4 bg-red-600 hover:bg-red-700 text-white font-black rounded-3xl shadow-xl shadow-red-100 transition-all active:scale-95 flex items-center justify-center gap-2 urdu-text"
             >
               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" /></svg>
               PDF
             </button>
             <button 
               onClick={printInvoice} 
-              className="flex-[1.5] px-4 py-4 bg-emerald-600 hover:bg-emerald-700 text-white font-black rounded-3xl shadow-xl shadow-emerald-200 transition-all active:scale-95 flex items-center justify-center gap-2"
+              className="flex-[1.5] px-4 py-4 bg-emerald-600 hover:bg-emerald-700 text-white font-black rounded-3xl shadow-xl shadow-emerald-200 transition-all active:scale-95 flex items-center justify-center gap-2 urdu-text"
             >
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" /></svg>
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 00-2 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" /></svg>
               پرنٹ بل
             </button>
           </div>
@@ -270,4 +320,3 @@ const App: React.FC = () => {
 };
 
 export default App;
-
