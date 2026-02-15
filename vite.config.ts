@@ -9,10 +9,16 @@ export default defineConfig({
   },
   build: {
     outDir: 'dist',
-    emptyOutDir: true
+    assetsDir: 'assets',
+    emptyOutDir: true,
+    rollupOptions: {
+      input: {
+        main: './index.html'
+      }
+    }
   },
   server: {
-    // historyApiFallback is not a valid property for Vite's ServerOptions.
-    // Vite handles SPA routing by falling back to index.html by default.
+    host: true
   }
 });
+
