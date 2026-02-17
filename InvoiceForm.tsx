@@ -28,7 +28,7 @@ const InvoiceForm: React.FC<Props> = ({ data, onChange, onScan, onPrint, onSaveP
       rate: data.ratePerMaund || 0,
       weight: 60 
     };
-    updateField('items', [...data.items, newItem]);
+    updateField('items', [...(data.items || []), newItem]);
   };
 
   const handleVoiceResult = (result: Partial<InvoiceItem>) => {
@@ -42,12 +42,12 @@ const InvoiceForm: React.FC<Props> = ({ data, onChange, onScan, onPrint, onSaveP
         rate: result.rate || data.ratePerMaund || 0,
         katt: 1
       };
-      updateField('items', [...data.items, newItem]);
+      updateField('items', [...(data.items || []), newItem]);
     }
   };
 
   const removeItem = (id: string) => {
-    updateField('items', data.items.filter(item => item.id !== id));
+    updateField('items', (data.items || []).filter(item => item.id !== id));
   };
 
   const addCustomExpense = (impact: 'plus' | 'minus') => {
@@ -61,19 +61,19 @@ const InvoiceForm: React.FC<Props> = ({ data, onChange, onScan, onPrint, onSaveP
   };
 
   const removeCustomExpense = (id: string) => {
-    updateField('customExpenses', data.customExpenses.filter(e => e.id !== id));
+    updateField('customExpenses', (data.customExpenses || []).filter(e => e.id !== id));
   };
 
-  const totalBags = data.items.reduce((acc, curr) => acc + curr.quantity, 0);
-  const totalKattWeight = data.items.reduce((acc, curr) => acc + (curr.quantity * curr.katt), 0);
-  const totalItemsWeight = data.items.reduce((acc, curr) => acc + curr.weight, 0);
+  const totalBags = (data.items || []).reduce((acc, curr) => acc + curr.quantity, 0);
+  const totalKattWeight = (data.items || []).reduce((acc, curr) => acc + (curr.quantity * curr.katt), 0);
+  const totalItemsWeight = (data.items || []).reduce((acc, curr) => acc + curr.weight, 0);
   const totalManualWeights = (data.weights || []).reduce((acc, curr) => acc + curr.weight, 0);
   
   const finalGrossWeight = totalItemsWeight > 0 ? totalItemsWeight : totalManualWeights;
   const activeNetWeight = finalGrossWeight - totalKattWeight;
   const netMaundsTotal = activeNetWeight / 40;
 
-  const totalGrossAmount = data.items.reduce((acc, item) => {
+  const totalGrossAmount = (data.items || []).reduce((acc, item) => {
     const itemNetMaunds = (item.weight - (item.quantity * item.katt)) / 40;
     return acc + (itemNetMaunds * item.rate);
   }, 0);
@@ -143,7 +143,7 @@ const InvoiceForm: React.FC<Props> = ({ data, onChange, onScan, onPrint, onSaveP
           </div>
         </div>
         <div className="space-y-3">
-          {data.items.map((item, idx) => (
+          {(data.items || []).map((item, idx) => (
             <div key={item.id} className="grid grid-cols-2 md:grid-cols-12 gap-3 items-end bg-white dark:bg-slate-800 p-3 rounded-2xl border border-emerald-50 dark:border-slate-700 shadow-sm transition-colors">
               <div className="md:col-span-3">
                 <label className="text-[9px] font-black text-gray-400 dark:text-slate-500 urdu-text">تفصیل</label>
