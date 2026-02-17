@@ -1,7 +1,7 @@
 
 import React, { useState, useRef } from 'react';
-import { parseVoiceCommand } from './services/geminiService';
-import { InvoiceItem } from './types';
+import { parseVoiceCommand } from '../services/geminiService';
+import { InvoiceItem } from '../types';
 
 interface Props {
   onResult: (item: Partial<InvoiceItem>) => void;
@@ -75,4 +75,5 @@ const VoiceEntry: React.FC<Props> = ({ onResult }) => {
 };
 
 export default VoiceEntry;
+
 
