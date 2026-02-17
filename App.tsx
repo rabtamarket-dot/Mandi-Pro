@@ -1,12 +1,12 @@
 
 import React, { useState, useEffect, useCallback } from 'react';
 import { InvoiceData, DEFAULT_INVOICE, UserProfile, BardanaLog } from './types';
-import InvoiceForm from './components/InvoiceForm';
-import InvoiceView from './components/InvoiceView';
-import AIScanner from './components/AIScanner';
-import Login from './components/Login';
-import BillHistory from './components/BillHistory';
-import BardanaManager from './components/BardanaManager';
+import InvoiceForm from './InvoiceForm';
+import InvoiceView from './InvoiceView';
+import AIScanner from './AIScanner';
+import Login from './Login';
+import BillHistory from './BillHistory';
+import BardanaManager from './BardanaManager';
 
 const App: React.FC = () => {
   const [theme, setTheme] = useState<'light' | 'dark'>(() => {
