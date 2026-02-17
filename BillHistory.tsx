@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { InvoiceData } from '../types';
+import { InvoiceData } from './types';
 
 interface Props {
   bills: InvoiceData[];
