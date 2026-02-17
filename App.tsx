@@ -1,12 +1,12 @@
 
 import React, { useState, useEffect, useCallback } from 'react';
 import { InvoiceData, DEFAULT_INVOICE, UserProfile, BardanaLog } from './types';
-import InvoiceForm from './InvoiceForm';
-import InvoiceView from './InvoiceView';
-import AIScanner from './AIScanner';
-import Login from './Login';
-import BillHistory from './BillHistory';
-import BardanaManager from './BardanaManager';
+import InvoiceForm from './components/InvoiceForm';
+import InvoiceView from './components/InvoiceView';
+import AIScanner from './components/AIScanner';
+import Login from './components/Login';
+import BillHistory from './components/BillHistory';
+import BardanaManager from './components/BardanaManager';
 
 const App: React.FC = () => {
   const [theme, setTheme] = useState<'light' | 'dark'>(() => {
@@ -104,7 +104,7 @@ const App: React.FC = () => {
   };
 
   const handleLogout = () => {
-    if (confirm('کیا آپ لاگ آؤٹ کرنا چاہتے ہیں؟ دوبارہ لاگ ان کے لیے کوڈ کی ضرورت ہوگی۔')) {
+    if (confirm('کیا آپ لاگ آؤٹ کرنا چاہتے ہیں؟')) {
       localStorage.removeItem('mandi_user_profile');
       setUserProfile(null);
     }
