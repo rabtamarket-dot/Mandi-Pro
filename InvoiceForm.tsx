@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { InvoiceData, InvoiceItem, CustomExpense } from './types';
+import { InvoiceData, InvoiceItem, CustomExpense } from '../types';
 import VoiceEntry from './VoiceEntry';
 
 interface Props {
