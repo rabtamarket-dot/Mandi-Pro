@@ -206,7 +206,7 @@ const App: React.FC = () => {
                 </button>
               </div>
               <div className="flex flex-wrap items-center gap-2">
-                <span className={`px-2 py-0.5 rounded-lg text-[10px] font-black urdu-text ${userProfile.role === 'owner' ? 'bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400' : 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400'}`}>
+                <span className={`px-2 py-0.5 rounded-lg text-[10px] font-black urdu-text ${userProfile.role === 'owner' ? 'bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400' : 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-amber-400'}`}>
                   {userProfile.role === 'owner' ? "مالک" : "منشی"}: {userProfile.name}
                 </span>
                 <button onClick={() => setShowHistory(true)} className="text-emerald-800 dark:text-emerald-400 bg-white dark:bg-slate-900 border border-gray-100 dark:border-slate-800 px-2 py-0.5 rounded-lg text-[10px] font-black urdu-text">بل ریکارڈ</button>
