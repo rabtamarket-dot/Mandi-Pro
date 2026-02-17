@@ -7,16 +7,16 @@ interface Props {
 }
 
 const InvoiceView: React.FC<Props> = ({ data }) => {
-  const totalBags = data.items.reduce((acc, curr) => acc + curr.quantity, 0);
-  const totalKattWeight = data.items.reduce((acc, curr) => acc + (curr.quantity * curr.katt), 0);
+  const totalBags = (data.items || []).reduce((acc, curr) => acc + curr.quantity, 0);
+  const totalKattWeight = (data.items || []).reduce((acc, curr) => acc + (curr.quantity * curr.katt), 0);
   
-  const totalItemsWeight = data.items.reduce((acc, curr) => acc + curr.weight, 0);
+  const totalItemsWeight = (data.items || []).reduce((acc, curr) => acc + curr.weight, 0);
   const totalManualWeights = (data.weights || []).reduce((acc, curr) => acc + curr.weight, 0);
   
   const finalGrossWeight = totalItemsWeight > 0 ? totalItemsWeight : totalManualWeights;
   const activeNetWeight = finalGrossWeight - totalKattWeight;
   
-  const totalGrossAmount = data.items.reduce((acc, item) => {
+  const totalGrossAmount = (data.items || []).reduce((acc, item) => {
     const itemNetWeight = item.weight - (item.quantity * item.katt);
     const itemNetMaunds = itemNetWeight / 40;
     return acc + (itemNetMaunds * item.rate);
@@ -94,7 +94,7 @@ const InvoiceView: React.FC<Props> = ({ data }) => {
 
       {/* Items Section */}
       <div className="mb-4 print:mb-3 urdu-text text-center px-1">
-        {data.items.map((item, idx) => {
+        {(data.items || []).map((item, idx) => {
           const itemNetWeight = item.weight - (item.quantity * item.katt);
           const itemNetMaunds = itemNetWeight / 40;
           const itemAmount = itemNetMaunds * item.rate;
@@ -126,8 +126,8 @@ const InvoiceView: React.FC<Props> = ({ data }) => {
                {add_labor > 0 && <div className="flex justify-between"><span>مزدوری:</span><span>{add_labor.toLocaleString()}</span></div>}
                {add_bardana > 0 && <div className="flex justify-between"><span>باردانہ:</span><span>{add_bardana.toLocaleString()}</span></div>}
                {add_brokerage > 0 && <div className="flex justify-between"><span>بروکری:</span><span>{add_brokerage.toLocaleString(undefined, {maximumFractionDigits:0})}</span></div>}
-               {data.add_biltyCharges > 0 && <div className="flex justify-between"><span>بلٹی:</span><span>{data.add_biltyCharges.toLocaleString()}</span></div>}
-               {(data.customExpenses || []).filter(e => e.impact === 'plus').map(e => <div key={e.id} className="flex justify-between"><span>{e.name}:</span><span>{e.amount.toLocaleString()}</span></div>)}
+               {data.add_biltyCharges > 0 && <div className="flex justify-between"><span>بلٹی کرایہ:</span><span>{data.add_biltyCharges.toLocaleString()}</span></div>}
+               {add_custom_list.map(e => <div key={e.id} className="flex justify-between"><span>{e.name}:</span><span>{e.amount.toLocaleString()}</span></div>)}
                <div className="flex justify-between font-black border-t border-blue-100 pt-1 text-blue-900 print:text-black mt-2">
                  <span>کل جمع:</span>
                  <span>{totalAdditions.toLocaleString(undefined, {maximumFractionDigits:0})}</span>
@@ -143,8 +143,8 @@ const InvoiceView: React.FC<Props> = ({ data }) => {
                {neg_labor > 0 && <div className="flex justify-between"><span>مزدوری:</span><span>{neg_labor.toLocaleString()}</span></div>}
                {neg_bardana > 0 && <div className="flex justify-between"><span>باردانہ:</span><span>{neg_bardana.toLocaleString()}</span></div>}
                {neg_brokerage > 0 && <div className="flex justify-between"><span>بروکری:</span><span>{neg_brokerage.toLocaleString(undefined, {maximumFractionDigits:0})}</span></div>}
-               {data.biltyCharges > 0 && <div className="flex justify-between"><span>بلٹی:</span><span>{data.biltyCharges.toLocaleString()}</span></div>}
-               {(data.customExpenses || []).filter(e => e.impact === 'minus').map(e => <div key={e.id} className="flex justify-between"><span>{e.name}:</span><span>{e.amount.toLocaleString()}</span></div>)}
+               {data.biltyCharges > 0 && <div className="flex justify-between"><span>بلٹی کرایہ:</span><span>{data.biltyCharges.toLocaleString()}</span></div>}
+               {neg_custom_list.map(e => <div key={e.id} className="flex justify-between"><span>{e.name}:</span><span>{e.amount.toLocaleString()}</span></div>)}
                <div className="flex justify-between font-black border-t border-red-100 pt-1 text-red-900 print:text-black mt-2">
                  <span>کل کٹوتی:</span>
                  <span>{totalDeductions.toLocaleString(undefined, {maximumFractionDigits:0})}</span>
