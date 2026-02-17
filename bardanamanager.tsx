@@ -75,3 +75,4 @@ const BardanaManager: React.FC<Props> = ({ logs, onAddLog, onClose }) => {
 };
 
 export default BardanaManager;
+
