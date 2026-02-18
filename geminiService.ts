@@ -1,14 +1,17 @@
 
 import { GoogleGenAI, Type } from "@google/genai";
-import { InvoiceData, InvoiceItem } from "./types";
+import { InvoiceData, InvoiceItem } from "../types";
 
-const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
-
+/**
+ * Extracts invoice from image using Gemini 3 Pro for advanced Urdu OCR and structured data.
+ */
 export const extractInvoiceFromImage = async (base64Image: string): Promise<Partial<InvoiceData>> => {
+  const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
+  
   const systemInstruction = `
     You are an expert Mandi (Grain Market) Billing Specialist.
     Your task is to extract billing details from a Mandi invoice image.
-    Specializing in handwritten notes and thermal printer receipts.
+    Specializing in handwritten notes and thermal printer receipts in Urdu.
     Return JSON.
   `;
 
@@ -63,7 +66,11 @@ export const extractInvoiceFromImage = async (base64Image: string): Promise<Part
   }
 };
 
+/**
+ * Parses Urdu voice commands into structured bill items.
+ */
 export const parseVoiceCommand = async (base64Audio: string): Promise<Partial<InvoiceItem>> => {
+  const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
   const systemInstruction = `
     You are an Urdu voice assistant for a Mandi App. 
     Analyze the audio and extract:
@@ -71,10 +78,6 @@ export const parseVoiceCommand = async (base64Audio: string): Promise<Partial<In
     - weight (وزن / کلو)
     - rate (ریٹ / قیمت)
     - description (نام - default to 'دھان')
-
-    Example input: "پچاس تھیلے ساٹھ کلو وزن ریٹ پینتالیس سو"
-    Result: { "quantity": 50, "weight": 60, "rate": 4500, "description": "دھان" }
-    
     Return pure JSON.
   `;
 
