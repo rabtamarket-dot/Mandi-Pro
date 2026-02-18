@@ -1,7 +1,8 @@
 {
-  "name": "Mandi Bill Pro - AI Invoice Editor",
-  "description": "A specialized invoice and weight management system for grain markets with AI-powered data extraction from handwritten notes.",
+  "name": "Mandi Bill Pro",
+  "description": "Professional AI-Powered Mandi Invoice and Weight Management System with Voice Commands and Staff Access.",
   "requestFramePermissions": [
-    "camera"
+    "camera",
+    "microphone"
   ]
 }
