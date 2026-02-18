@@ -22,6 +22,21 @@ export interface InvoiceItem {
   weight: number; 
 }
 
+export interface UserProfile {
+  name: string;
+  phone: string;
+  address: string;
+  role: 'owner' | 'staff';
+}
+
+export interface BardanaLog {
+  id: string;
+  date: string;
+  type: 'in' | 'out';
+  quantity: number;
+  note: string;
+}
+
 export interface InvoiceData {
   id?: string;
   shopName: string;
@@ -34,14 +49,12 @@ export interface InvoiceData {
   brokerName: string;
   ratePerMaund: number;
   
-  // Deductions (-)
   commissionRate: number;
   khaliBardanaRate: number;
   brokerageRate: number;
   laborCharges: number;
   biltyCharges: number;
   
-  // Additions (+)
   add_commissionRate: number;
   add_khaliBardanaRate: number;
   add_brokerageRate: number;
