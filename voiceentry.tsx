@@ -77,3 +77,4 @@ const VoiceEntry: React.FC<Props> = ({ onResult }) => {
 export default VoiceEntry;
 
 
+
